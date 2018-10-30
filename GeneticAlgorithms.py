@@ -1,4 +1,13 @@
 import random
+from sklearn.model_selection import StratifiedKFold
+from sklearn.preprocessing import StandardScaler, normalize
+from sklearn import svm
+from sklearn.neural_network import MLPClassifier
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.model_selection import StratifiedKFold
+from sklearn import preprocessing
+import numpy as np
+from sklearn.model_selection import cross_val_score
 
 
 # initializes the beginning population of feature masks
@@ -29,21 +38,30 @@ def initialize_population(num_masks, mask_len):
 # inputs: list of feature masks
 # return: list of feature masks with rating
 #         (example: [([list of fms], rating), ([list of fms], rating), etc.])
-#def gen_evaluation(fm_list):
+#def evaluation(fm_list):
 
 
 # for SSGA and EGA
 # randomly selects x (normally 2) number of parents to be chosen to procreate
-# inputs: list of feature masks with rating (gen_evaluation output)
+# inputs: list of feature masks, number of parents
 # return: list of feature vectors to act as parents
-#def randomly_select_parents(fmar_list):
+def randomly_select_parents(fm_list, num_parent):
+    parent_list = []
+
+    for index in range(num_parent):
+        rand = random.randint(0, len(fm_list) - 1)
+        parent = fm_list[rand]
+        parent_list.append(parent)
+
+    return parent_list
+
 
 
 # for EDA
 # selects x (normally 12) number of best parents to be chosen to procreate
-# inputs: list of feature masks with rating (gen_evaluation output)
+# inputs: list of feature masks with rating (gen_evaluation output), number of parents
 # return: list of feature vectors to act as parents
-#def randomly_select_parents(fmar_list):
+#def select_best_parents(fmar_list, num_parents):
 
 
 # creates x number of children from a set of parents
@@ -107,14 +125,28 @@ def mutation(feature_mask_list):
 # EXAMPLES
 fm_length = 10
 number_of_fms = 5
-number_of_children = 2
+number_of_parents = 2
+number_of_children = 1
+
+print "Feature Mask List:"
 
 fm_list = initialize_population(number_of_fms, fm_length)
 for fm in fm_list:
     print fm
 
-print " "
+print "\nParent Feature Mask List:"
+
+par_list = randomly_select_parents(fm_list, number_of_parents)
+for fm in par_list:
+    print fm
+
+print "\nChild Feature Mask List:"
 
 child_list = procreate(fm_list, number_of_children)
 for fm in child_list:
     print fm
+
+
+#lsvm = svm.LinearSVC()
+#lsvm.fit(train_data, train_labels)
+#lsvm_acc = lsvm.score(eval_data, eval_labels)

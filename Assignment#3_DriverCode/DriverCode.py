@@ -47,7 +47,7 @@ for train, test in skf.split(CU_X, Y):
     CU_train_data = normalize(CU_train_data)
     CU_eval_data = normalize(CU_eval_data)
 
-    train_data =  CU_train_data
+    train_data = CU_train_data
     eval_data = CU_eval_data
 
     # evaluation
@@ -61,4 +61,4 @@ for train, test in skf.split(CU_X, Y):
 
     fold_accuracy.append((lsvm_acc, rbfsvm_acc, mlp_acc))
 
-print(np.mean(fold_accuracy, axis = 0))
+print(np.mean(fold_accuracy, axis=0))
