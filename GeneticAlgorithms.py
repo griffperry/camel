@@ -37,7 +37,7 @@ def initialize_population(num_masks, mask_len):
 # evaluates how well feature masks perform
 # inputs: list of feature masks
 # return: list of feature masks with rating
-#         (example: [([list of fms], rating), ([list of fms], rating), etc.])
+#         (example: [([feature mask], rating), ([feature mask], rating), etc.])
 #def evaluation(fm_list):
 
 
@@ -48,20 +48,35 @@ def initialize_population(num_masks, mask_len):
 def randomly_select_parents(fm_list, num_parent):
     parent_list = []
 
+    # for loop to get x parents
     for index in range(num_parent):
+        # chooses a random feature mask as a parent
         rand = random.randint(0, len(fm_list) - 1)
         parent = fm_list[rand]
+        # adds feature mask to list of parents
         parent_list.append(parent)
 
     return parent_list
-
 
 
 # for EDA
 # selects x (normally 12) number of best parents to be chosen to procreate
 # inputs: list of feature masks with rating (gen_evaluation output), number of parents
 # return: list of feature vectors to act as parents
-#def select_best_parents(fmar_list, num_parents):
+def select_best_parents(fmar_list, num_parent):
+    parent_list = []
+
+    # sorts list of feature masks by ranking
+    sorted_fmar_list = sorted(fmar_list, key=lambda fmar: fmar[1])
+
+    # for loop to get best x parents
+    for index in range(num_parent):
+        # gets feature mask at index
+        parent = sorted_fmar_list[index]
+        # adds feature mask to the list of parents
+        parent_list.append(parent)
+
+    return parent_list
 
 
 # creates x number of children from a set of parents
@@ -92,6 +107,7 @@ def procreate(parent_vectors, num_children):
 
     # mutates child feature masks
     mutated_child_mask_vectors = mutation(child_mask_vectors)
+
     return mutated_child_mask_vectors
 
 
@@ -119,7 +135,25 @@ def mutation(feature_mask_list):
 # inputs: list of parent feature masks with rating, list of child feature masks with rating,
 #         number of parents to be replaced (example: SSGA is 1, EGA is 24, EDA is 24)
 # return: list of feature vectors to be the next generation
-#def replacement():
+def replacement(parent_fmar_list, child_fmar_list, num_replace):
+    new_gen_list = []
+    # get the number of parents that will be kept
+    num_keep = len(parent_fmar_list) - num_replace
+
+    # sorts list of parent feature masks by ranking
+    sorted_parent_fmar_list = sorted(parent_fmar_list, key=lambda fmar: fmar[1])
+    # sorts list of child feature masks by ranking
+    sorted_child_fmar_list = sorted(child_fmar_list, key=lambda fmar: fmar[1])
+
+    # for loop gets the best x parents and adds them to the new generation
+    for index in range(num_keep):
+        new_gen_list.append(sorted_parent_fmar_list[index])
+
+    # for loop gets the best x children and adds them to the new generation
+    for index in range(num_replace):
+        new_gen_list.append(sorted_child_fmar_list[index])
+
+    return new_gen_list
 
 
 # EXAMPLES
@@ -145,7 +179,6 @@ print "\nChild Feature Mask List:"
 child_list = procreate(fm_list, number_of_children)
 for fm in child_list:
     print fm
-
 
 #lsvm = svm.LinearSVC()
 #lsvm.fit(train_data, train_labels)
