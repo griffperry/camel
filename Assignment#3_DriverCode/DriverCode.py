@@ -1,14 +1,10 @@
 import Data_Utils
-from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import StandardScaler, normalize
 from sklearn import svm
 from sklearn.neural_network import MLPClassifier
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.model_selection import StratifiedKFold
-from sklearn import preprocessing
 import numpy as np
-from sklearn.model_selection import cross_val_score
-
 
 CU_X, Y = Data_Utils.Get_Casis_CUDataset()
 
@@ -61,4 +57,5 @@ for train, test in skf.split(CU_X, Y):
 
     fold_accuracy.append((lsvm_acc, rbfsvm_acc, mlp_acc))
 
+print fold_accuracy
 print(np.mean(fold_accuracy, axis=0))

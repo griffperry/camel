@@ -9,6 +9,7 @@ def Get_Casis_CUDataset():
             line = line.strip().split(",")
             Y.append(line[0][:4])
             X.append([float(x) for x in line[1:]])
+    print np.array(X), np.array(Y)
     return np.array(X), np.array(Y)
       
 class DenseTransformer(BaseEstimator, TransformerMixin):
