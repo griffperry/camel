@@ -25,18 +25,18 @@ def getNeighbors(trainingSet, testInstance, resultCount):
 
 def compute_fire_strengths(index, test_set, training_set, sigma):
 
-    author1 = list_maker(d, 12, 6, 1, 0)
-    author2 = list_maker(d, 12, 6, 1, 1)
-    author3 = list_maker(d, 12, 6, 1, 2)
-    author4 = list_maker(d, 12, 6, 1, 3)
-    author5 = list_maker(d, 12, 6, 1, 4)
-    author6 = list_maker(d, 12, 6, 1, 5)
+    author1 = list_maker(d, 12, 8, 1, 0)
+    author2 = list_maker(d, 12, 8, 1, 1)
+    author3 = list_maker(d, 12, 8, 1, 2)
+    author4 = list_maker(d, 12, 8, 1, 3)
+    author5 = list_maker(d, 12, 8, 1, 4)
+    author6 = list_maker(d, 12, 8, 1, 5)
     author7 = list_maker(d, 12, 6, 1, 6)
-    author8 = list_maker(d, 12, 6, 1, 7)
-    author9 = list_maker(d, 12, 6, 1, 8)
-    author10 = list_maker(d, 12, 6, 1, 9)
-    author11 = list_maker(d, 12, 6, 1, 10)
-    author12 = list_maker(d, 12, 6, 1, 11)
+    author8 = list_maker(d, 12, 8, 1, 7)
+    author9 = list_maker(d, 12, 8, 1, 8)
+    author10 = list_maker(d, 12, 8, 1, 9)
+    author11 = list_maker(d, 12, 8, 1, 10)
+    author12 = list_maker(d, 12, 8, 1, 11)
 
     i = 0
     dq = []
