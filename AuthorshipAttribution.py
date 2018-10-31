@@ -4,7 +4,7 @@ from K_Weighted_Nearest_Neighbor import get_weighted_neighbors, get_weighted_dis
     get_weighted_accuracy
 from homework1 import read_dataset, feature_vectors, write_to_feature_vector_file, normalize_fv
 from GRNN import dist_squared, compute_fire_strengths, hf, compute_fire_strengths_CASIS25
-from GeneticAlgorithms import replacement, evaluation, procreate, randomly_select_parents, initialize_population,\
+from GeneticAlgorithms import replacement, evaluation, procreate, tournament_select_parents, initialize_population,\
     select_best_parents
 
 
@@ -740,128 +740,295 @@ for i in range(len(feature_vector_list)):
     del feature_vectors[i][-1]
 
 
-# Testing
-'''fvs = [[2.0, 6.0, 4.0], [3.0, 5.0, 2.0], [2.0, 7.0, 2.0], [3.0, 6.0, 1.0], [2.0, 5.0, 4.0], [3.0, 7.0, 3.0],
-       [3.0, 9.0, 7.0], [4.0, 7.0, 8.0], [4.0, 8.0, 6.0], [5.0, 6.0, 7.0], [5.0, 6.0, 6.0], [7.0, 6.0, 8.0],
-       [2.0, 6.0, 0.0], [1.0, 8.0, 3.0], [0.0, 7.0, 1.0], [1.0, 7.0, 1.0], [2.0, 8.0, 2.0], [2.0, 7.0, 3.0]]
-aths = ['1', '1', '1', '1', '1', '1', '2', '2', '2', '2', '2', '2', '3', '3', '3', '3', '3', '3']
-fms = initialize_population(5, 3)
-
-for i in range(5):
-    par = randomly_select_parents(fms, 2)
-    child = procreate(par, 1)
-    rated_p = evaluation(fvs, aths, fms)
-    rated_c = evaluation(fvs, aths, child)
-    fms = replacement(rated_p, rated_c, 1)
-    print fms
-'''
-
 # Steady State Genetic Algorithm
+# No Innovations: 95, 25, 2, 2, 1, 1, False, 5000, 10
 SSGA_fm_length = 95
 SSGA_number_of_fms = 25
+SSGA_number_of_potential_parents = 2
 SSGA_number_of_parents = 2
 SSGA_number_of_children = 1
 SSGA_number_to_replace = 1
-SSGA_iterations = 5000
+SSGA_is_replacement_combined = False
+SSGA_number_of_iterations = 5000
+SSGA_number_of_runs = 10
+SSGA_last_generation_ratings = []
 
-# initialize the feature mask population
-SSGA_generation_list = initialize_population(SSGA_number_of_fms, SSGA_fm_length)
-# decrement the number of iterations by the number of feature masks created
-SSGA_iterations = SSGA_iterations - SSGA_number_of_fms
+print "Steady State Genetic Algorithm"
 
-# while loop makes sure that the correct number of evaluations have been performed
-while (SSGA_iterations > 0):
-    print SSGA_iterations
-    # 2 parents are randomly selected from the feature mask generation
-    SSGA_parent_list = randomly_select_parents(SSGA_generation_list, SSGA_number_of_parents)
-    # 1 child is created from the 2 selected parents
-    SSGA_child_list = procreate(SSGA_parent_list, SSGA_number_of_children)
+# run SSGA x number of times
+for index in range(SSGA_number_of_runs):
+    SSGA_best_ratings = []
+    SSGA_ratings_over_time = []
+    SSGA_sum = 0
 
-    # the generation is rated by accuracy
+    # initialize the feature mask population
+    SSGA_generation_list = initialize_population(SSGA_number_of_fms, SSGA_fm_length)
+
+    # the initial generation is rated by accuracy
     SSGA_generation_list_rated = evaluation(feature_vectors, authors, SSGA_generation_list)
-    # the child is rated by accuracy
-    SSGA_child_list_rated = evaluation(feature_vectors, authors, SSGA_child_list)
 
-    # the child replaces the worst individual in the generation
-    SSGA_generation_list, SSGA_final_list_rated = replacement(SSGA_generation_list_rated, SSGA_child_list_rated, SSGA_number_to_replace)
+    # gets sum of all feature mask ratings
+    for rating in SSGA_generation_list_rated:
+        SSGA_sum = SSGA_sum + rating[1]
 
-    # decrement the number of iterations by the number of children created
-    SSGA_iterations = SSGA_iterations - len(SSGA_child_list)
+    # gets average of all feature mask ratings
+    SSGA_average = SSGA_sum / len(SSGA_generation_list_rated)
 
-for rate in SSGA_final_list_rated:
-    print rate
+    # adds rating average to rating list
+    SSGA_ratings_over_time.append(SSGA_average)
 
+    # initialize iteration number
+    SSGA_iterations = SSGA_number_of_iterations
+
+    # decrement the number of iterations by the number of feature masks created
+    SSGA_iterations = SSGA_iterations - SSGA_number_of_fms
+
+    # while loop makes sure that the correct number of evaluations have been performed
+    while (SSGA_iterations > 0):
+        SSGA_sum = 0
+        #print SSGA_iterations
+
+        # 2 parents are randomly selected from the feature mask generation
+        SSGA_parent_list = tournament_select_parents(SSGA_generation_list_rated, SSGA_number_of_parents,
+                                                     SSGA_number_of_potential_parents)
+        # 1 child is created from the 2 selected parents
+        SSGA_child_list = procreate(SSGA_parent_list, SSGA_number_of_children)
+
+        # the child is rated by accuracy
+        SSGA_child_list_rated = evaluation(feature_vectors, authors, SSGA_child_list)
+
+        # the child replaces the worst individual in the generation
+        SSGA_generation_list, SSGA_generation_list_rated = replacement(SSGA_generation_list_rated, SSGA_child_list_rated,
+                                                                       SSGA_number_to_replace, SSGA_is_replacement_combined)
+
+        # gets sum of all feature mask ratings
+        for rating in SSGA_generation_list_rated:
+            SSGA_sum = SSGA_sum + rating[1]
+
+        # gets average of all feature mask ratings
+        SSGA_average = SSGA_sum / len(SSGA_generation_list_rated)
+
+        # adds rating average to rating list
+        SSGA_ratings_over_time.append(SSGA_average)
+
+        # decrement the number of iterations by the number of children created
+        SSGA_iterations = SSGA_iterations - len(SSGA_child_list)
+
+    # add average rating of last generation to list
+    SSGA_last_generation_ratings.append(SSGA_ratings_over_time[-1])
+    print SSGA_ratings_over_time
+
+# get average of the final rating of each generation
+SSGA_final_sum = 0
+SSGA_final_max = 0
+
+# for loop goes through each rating
+for rat in SSGA_last_generation_ratings:
+    # gets sum of final ratings
+    SSGA_final_sum = SSGA_final_sum + rat
+    # gets max value of final ratings
+    if (rat > SSGA_final_max):
+        SSGA_final_max = rat
+# gets average of final ratings
+SSGA_final_average = SSGA_final_sum / len(SSGA_last_generation_ratings)
+
+print "SSGA Ratings for Each Generation: ", SSGA_last_generation_ratings
+print "SSGA Max Rating: ", SSGA_final_max
+print "SSGA Average Rating: ", SSGA_final_average
 
 # Elitist Genetic Algorithm
-'''EGA_fm_length = 95
+# No Innovations: 95, 25, 2, 2, 1, 24, False, 5000, 10
+EGA_fm_length = 95
 EGA_number_of_fms = 25
+EGA_number_of_potential_parents = 2
 EGA_number_of_parents = 2
 EGA_number_of_children = 1
 EGA_number_to_replace = 24
-EGA_iterations = 5000
+EGA_is_replacement_combined = False
+EGA_number_of_iterations = 5000
+EGA_number_of_runs = 10
+EGA_last_generation_ratings = []
 
-EGA_child_list = []
+print "\nElitist Genetic Algorithm"
 
-# initialize the feature mask population
-EGA_generation_list = initialize_population(EGA_number_of_fms, EGA_fm_length)
-# decrement the number of iterations by the number of feature masks created
-EGA_iterations = EGA_iterations - EGA_number_of_fms
+# run EGA x number of times
+for index in range(EGA_number_of_runs):
+    EGA_best_ratings = []
+    EGA_ratings_over_time = []
+    EGA_child_list = []
+    EGA_sum = 0
 
-# while loop makes sure that the correct number of evaluations have been performed
-while (EGA_iterations > 0):
-    for index in range(EGA_number_to_replace):
-        # 2 parents are randomly selected from the feature mask generation
-        EGA_parent_list = randomly_select_parents(EGA_generation_list, EGA_number_of_parents)
-        # 1 child is created from the 2 selected parents
-        EGA_child = procreate(EGA_parent_list, EGA_number_of_children)
-        # child is added to child list
-        EGA_child_list.append(EGA_child)
+    # initialize the feature mask population
+    EGA_generation_list = initialize_population(EGA_number_of_fms, EGA_fm_length)
 
-    # the generation is rated by accuracy
+    # the initial generation is rated by accuracy
     EGA_generation_list_rated = evaluation(feature_vectors, authors, EGA_generation_list)
-    # the children are rated by accuracy
-    EGA_child_list_rated = evaluation(feature_vectors, authors, EGA_child_list)
 
-    # the child replaces the worst 24 individuals in the generation
-    EGA_generation_list, EGA_final_list_rated = replacement(EGA_generation_list_rated, EGA_child_list_rated, EGA_number_to_replace)
+    # gets sum of all feature mask ratings
+    for rating in EGA_generation_list_rated:
+        EGA_sum = EGA_sum + rating[1]
 
-    # decrement the number of iterations by the number of children created
-    EGA_iterations = EGA_iterations - len(EGA_child_list)
+    # gets average of all feature mask ratings
+    EGA_average = EGA_sum / len(EGA_generation_list_rated)
 
-print EGA_final_list_rated
+    # adds rating average to rating list
+    EGA_ratings_over_time.append(EGA_average)
 
+    # initialize iteration number
+    EGA_iterations = EGA_number_of_iterations
+
+    # decrement the number of iterations by the number of feature masks created
+    EGA_iterations = EGA_iterations - EGA_number_of_fms
+
+    # while loop makes sure that the correct number of evaluations have been performed
+    while (EGA_iterations > 0):
+        EGA_sum = 0
+        EGA_child_list = []
+        #print EGA_iterations
+
+        for index in range(EGA_number_to_replace):
+            # 2 parents are randomly selected from the feature mask generation
+            EGA_parent_list = tournament_select_parents(EGA_generation_list_rated, EGA_number_of_parents,
+                                                        EGA_number_of_potential_parents)
+            # 1 child is created from the 2 selected parents
+            EGA_child = procreate(EGA_parent_list, EGA_number_of_children)
+            EGA_single_child = EGA_child[0]
+            # child is added to child list
+            EGA_child_list.append(EGA_single_child)
+
+        # the children are rated by accuracy
+        EGA_child_list_rated = evaluation(feature_vectors, authors, EGA_child_list)
+
+        # the child replaces the worst 24 individuals in the generation
+        EGA_generation_list, EGA_generation_list_rated = replacement(EGA_generation_list_rated, EGA_child_list_rated,
+                                                                     EGA_number_to_replace, EGA_is_replacement_combined)
+
+        # gets sum of all feature mask ratings
+        for rating in EGA_generation_list_rated:
+            EGA_sum = EGA_sum + rating[1]
+
+        # gets average of all feature mask ratings
+        EGA_average = EGA_sum / len(EGA_generation_list_rated)
+
+        # adds rating average to rating list
+        EGA_ratings_over_time.append(EGA_average)
+
+        # decrement the number of iterations by the number of children created
+        EGA_iterations = EGA_iterations - len(EGA_child_list)
+
+    # add average rating of last generation to list
+    EGA_last_generation_ratings.append(EGA_ratings_over_time[-1])
+    print EGA_ratings_over_time
+
+# get average of the final rating of each generation
+EGA_final_sum = 0
+EGA_final_max = 0
+
+# for loop goes through each rating
+for rat in EGA_last_generation_ratings:
+    # gets sum of final ratings
+    EGA_final_sum = EGA_final_sum + rat
+    # gets max value of final ratings
+    if (rat > EGA_final_max):
+        EGA_final_max = rat
+# gets average of final ratings
+EGA_final_average = EGA_final_sum / len(EGA_last_generation_ratings)
+
+print "EGA Ratings for Each Generation: ", EGA_last_generation_ratings
+print "EGA Max Rating: ", EGA_final_max
+print "EGA Average Rating: ", EGA_final_average
 
 # Estimation of Distribution Algorithm
-EDA_fm_length = 10
-EDA_number_of_fms = 5
+# No Innovations: 95, 25, 12, 24, 24, False, 5000, 10
+EDA_fm_length = 95
+EDA_number_of_fms = 25
 EDA_number_of_parents = 12
 EDA_number_of_children = 24
 EDA_number_to_replace = 24
-EDA_iterations = 5000
+EDA_is_replacement_combined = False
+EDA_number_of_iterations = 5000
+EDA_number_of_runs = 10
+EDA_last_generation_ratings = []
 
-EDA_child_list = []
+print "\nEstimation of Distribution Algorithm"
 
-# initialize the feature mask population
-EDA_generation_list = initialize_population(EDA_number_of_fms, EDA_fm_length)
-# decrement the number of iterations by the number of feature masks created
-EDA_iterations = EDA_iterations - EDA_number_of_fms
+# run EDA x number of times
+for index in range(EDA_number_of_runs):
+    EDA_best_ratings = []
+    EDA_ratings_over_time = []
+    EDA_child_list = []
+    EDA_sum = 0
 
-# while loop makes sure that the correct number of evaluations have been performed
-while (EDA_iterations > 0):
-    # 12 best parents are selected from the feature mask generation
-    EDA_parent_list = select_best_parents(EDA_generation_list, EDA_number_of_parents)
-    # 24 children are created from the 12 selected parents
-    EDA_child_list = procreate(EDA_parent_list, EDA_number_of_children)
+    # initialize the feature mask population
+    EDA_generation_list = initialize_population(EDA_number_of_fms, EDA_fm_length)
 
-    # the generation is rated by accuracy
+    # the initial generation is rated by accuracy
     EDA_generation_list_rated = evaluation(feature_vectors, authors, EDA_generation_list)
-    # the children are rated by accuracy
-    EDA_child_list_rated = evaluation(feature_vectors, authors, EDA_child_list)
 
-    # the children replace the worst 24 individuals in the generation
-    EDA_generation_list, EDA_final_list_rated = replacement(EDA_generation_list_rated, EDA_child_list_rated, EDA_number_to_replace)
+    # gets sum of all feature mask ratings
+    for rating in EDA_generation_list_rated:
+        EDA_sum = EDA_sum + rating[1]
 
-    # decrement the number of iterations by the number of children created
-    EDA_iterations = EDA_iterations - len(EDA_child_list)
-    
-print EDA_final_list_rated'''
+    # gets average of all feature mask ratings
+    EDA_average = EDA_sum / len(EDA_generation_list_rated)
+
+    # adds rating average to rating list
+    EDA_ratings_over_time.append(EDA_average)
+
+    # initialize iteration number
+    EDA_iterations = EDA_number_of_iterations
+
+    # decrement the number of iterations by the number of feature masks created
+    EDA_iterations = EDA_iterations - EDA_number_of_fms
+
+    # while loop makes sure that the correct number of evaluations have been performed
+    while (EDA_iterations > 0):
+        EDA_sum = 0
+        #print EDA_iterations
+
+        # 12 best parents are selected from the feature mask generation
+        EDA_parent_list = select_best_parents(EDA_generation_list, EDA_number_of_parents)
+        # 24 children are created from the 12 selected parents
+        EDA_child_list = procreate(EDA_parent_list, EDA_number_of_children)
+
+        # the children are rated by accuracy
+        EDA_child_list_rated = evaluation(feature_vectors, authors, EDA_child_list)
+
+        # the children replace the worst 24 individuals in the generation
+        EDA_generation_list, EDA_generation_list_rated = replacement(EDA_generation_list_rated, EDA_child_list_rated,
+                                                                     EDA_number_to_replace, EDA_is_replacement_combined)
+
+        # gets sum of all feature mask ratings
+        for rating in EDA_generation_list_rated:
+            EDA_sum = EDA_sum + rating[1]
+
+        # gets average of all feature mask ratings
+        EDA_average = EDA_sum / len(EDA_generation_list_rated)
+
+        # adds rating average to rating list
+        EDA_ratings_over_time.append(EDA_average)
+
+        # decrement the number of iterations by the number of children created
+        EDA_iterations = EDA_iterations - len(EDA_child_list)
+
+    # add average rating of last generation to list
+    EDA_last_generation_ratings.append(EDA_ratings_over_time[-1])
+    print EDA_ratings_over_time
+
+# get average of the final rating of each generation
+EDA_final_sum = 0
+EDA_final_max = 0
+
+# for loop goes through each rating
+for rat in EDA_last_generation_ratings:
+    # gets sum of final ratings
+    EDA_final_sum = EDA_final_sum + rat
+    # gets max value of final ratings
+    if (rat > EDA_final_max):
+        EDA_final_max = rat
+# gets average of final ratings
+EDA_final_average = EDA_final_sum / len(EDA_last_generation_ratings)
+
+print "EDA Ratings for Each Generation: ", EDA_last_generation_ratings
+print "EDA Max Rating: ", EDA_final_max
+print "EDA Average Rating: ", EDA_final_average
