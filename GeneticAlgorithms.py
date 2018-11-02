@@ -102,7 +102,7 @@ def evaluation(fv_list, author_list, fm_list):
 
             fold_accuracy.append(lsvm_acc)
 
-        #
+        # get the accuracy of a fold
         rating = np.mean(fold_accuracy, axis=0)
 
         append_fm = fm
@@ -115,24 +115,26 @@ def evaluation(fv_list, author_list, fm_list):
 # randomly selects x (normally 2) number of parents to be chosen to procreate
 # inputs: list of feature masks, number of parents
 # return: list of feature vectors to act as parents
-def tournament_select_parents(fm_list, num_parent, num_tournament):
-    tournament_list = []
+def tournament_select_parents(fm_list, num_parent, num_potentials):
+    potential_list = []
     parent_list = []
 
     # for loop to get x parents
     for par in range(num_parent):
         # for loop to get x potential parents
-        for tour in range(num_tournament):
+        for pot in range(num_potentials):
             # chooses a random feature mask as a potential parent
             rand = random.randint(0, len(fm_list) - 1)
             potential = fm_list[rand]
             # adds potential parent to list of potential parents
-            tournament_list.append(potential)
+            potential_list.append(potential)
 
         # sort potential parents by rating
-        sorted_tournament_list = sorted(tournament_list, key=lambda fmar: fmar[1], reverse=True)
+        sorted_potential_list = sorted(potential_list, key=lambda fmar: fmar[1], reverse=True)
         # select best potential parent as a parent
-        parent_list.append(sorted_tournament_list[0][0])
+        parent_list.append(sorted_potential_list[0][0])
+        # clear list of potential parents
+        potential_list = []
 
     return parent_list
 
@@ -160,7 +162,7 @@ def select_best_parents(fmar_list, num_parent):
 # creates x number of children from a set of parents
 # inputs: list of parent feature masks, number of children desired
 # return: list of child feature masks
-def procreate(parent_vectors, num_children):
+def procreate(parent_vectors, num_children, mutation_rate):
     child_mask = []
     child_mask_vectors = []
 
@@ -184,7 +186,7 @@ def procreate(parent_vectors, num_children):
         child_mask = []
 
     # mutates child feature masks
-    mutated_child_mask_vectors = mutation(child_mask_vectors)
+    mutated_child_mask_vectors = mutation(child_mask_vectors, mutation_rate)
 
     return mutated_child_mask_vectors
 
@@ -193,7 +195,7 @@ def procreate(parent_vectors, num_children):
 # mutates child feature masks as a part of procreation
 # inputs: list of child feature masks
 # return: list of mutated child feature masks
-def mutation(feature_mask_list):
+def mutation(feature_mask_list, mutation_rate):
     # copies given feature masks to a new list
     new_feature_mask_list = feature_mask_list
 
@@ -201,8 +203,8 @@ def mutation(feature_mask_list):
     for fm in new_feature_mask_list:
         # second for loop goes through each value of a feature mask
         for index in range(len(fm)):
-            # flips the value (0 to 1 or 1 to 0) 5% of the time
-            if (random.randint(1, 101) < 6):
+            # flips the value (0 to 1 or 1 to 0) x percent of the time
+            if (random.randint(1, 101) < mutation_rate + 1):
                 fm[index] = fm[index] ^ 1
 
     return new_feature_mask_list

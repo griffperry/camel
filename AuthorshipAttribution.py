@@ -6,6 +6,13 @@ from homework1 import read_dataset, feature_vectors, write_to_feature_vector_fil
 from GRNN import dist_squared, compute_fire_strengths, hf, compute_fire_strengths_CASIS25
 from GeneticAlgorithms import replacement, evaluation, procreate, tournament_select_parents, initialize_population,\
     select_best_parents
+import Data_Utils
+from sklearn.preprocessing import StandardScaler, normalize
+from sklearn import svm
+from sklearn.neural_network import MLPClassifier
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.model_selection import StratifiedKFold
+import numpy as np
 
 
 #read in text files
@@ -61,8 +68,8 @@ week_3_author_6 = read_dataset("CFN_Fiutak_TennesseeVsUTEP_wk3.txt")
 week_4_author_6 = read_dataset("CFN_Fiutak_TennesseeVsFLO_wk4.txt")
 week_5_author_6 = read_dataset("CFN_Fiutak_TennesseeVsGA_wk5.txt")
 week_6_author_6 = read_dataset("CFN_Fiutak_TennesseeVsAUB_wk6.txt")
-#week_7_author_6 = read_dataset("CFN_Fiutak_TennesseeVsALA_wk7.txt")
-#week_8_author_6 = read_dataset("CFN_Fiutak_TennesseeVsSC_wk8.txt")
+week_7_author_6 = read_dataset("CFN_Fiutak_TennesseeVsALA_wk7.txt")
+week_8_author_6 = read_dataset("CFN_Fiutak_TennesseeVsSC_wk8.txt")
 
 
 week_1_author_7 = read_dataset("RockyTopTalk_Knapp_TennesseeVsWVA_wk1.txt")
@@ -232,8 +239,8 @@ week_3_author_6_fv = feature_vectors(week_3_author_6, 6)
 week_4_author_6_fv = feature_vectors(week_4_author_6, 6)
 week_5_author_6_fv = feature_vectors(week_5_author_6, 6)
 week_6_author_6_fv = feature_vectors(week_6_author_6, 6)
-#week_7_author_6_fv = feature_vectors(week_7_author_6, 6)
-#week_8_author_6_fv = feature_vectors(week_8_author_6, 6)
+week_7_author_6_fv = feature_vectors(week_7_author_6, 6)
+week_8_author_6_fv = feature_vectors(week_8_author_6, 6)
 
 
 feature_vector_list.append(week_1_author_6_fv)
@@ -242,8 +249,8 @@ feature_vector_list.append(week_3_author_6_fv)
 feature_vector_list.append(week_4_author_6_fv)
 feature_vector_list.append(week_5_author_6_fv)
 feature_vector_list.append(week_6_author_6_fv)
-#feature_vector_list.append(week_7_author_6_fv)
-#feature_vector_list.append(week_8_author_6_fv)
+feature_vector_list.append(week_7_author_6_fv)
+feature_vector_list.append(week_8_author_6_fv)
 
 
 
@@ -842,16 +849,71 @@ feature_vectors = list(feature_vector_list)
 for i in range(len(feature_vector_list)):
     del feature_vectors[i][-1]
 
+CU_X = np.array(feature_vectors)
+Y = np.array(authors)
+
+rbfsvm = svm.SVC()
+lsvm = svm.LinearSVC()
+mlp = MLPClassifier(max_iter=2000)
+
+skf = StratifiedKFold(n_splits=4, shuffle=True, random_state=0)
+fold_accuracy = []
+
+scaler = StandardScaler()
+tfidf = TfidfTransformer(norm=None)
+dense = Data_Utils.DenseTransformer()
+
+for train, test in skf.split(CU_X, Y):
+    # train split
+    CU_train_data = CU_X[train]
+    train_labels = Y[train]
+
+    # test split
+    CU_eval_data = CU_X[test]
+    eval_labels = Y[test]
+
+    # tf-idf
+    tfidf.fit(CU_train_data)
+    CU_train_data = dense.transform(tfidf.transform(CU_train_data))
+    CU_eval_data = dense.transform(tfidf.transform(CU_eval_data))
+
+    # standardization
+    scaler.fit(CU_train_data)
+    CU_train_data = scaler.transform(CU_train_data)
+    CU_eval_data = scaler.transform(CU_eval_data)
+
+    # normalization
+    CU_train_data = normalize(CU_train_data)
+    CU_eval_data = normalize(CU_eval_data)
+
+    train_data = CU_train_data
+    eval_data = CU_eval_data
+
+    # evaluation
+    rbfsvm.fit(train_data, train_labels)
+    lsvm.fit(train_data, train_labels)
+    mlp.fit(train_data, train_labels)
+
+    rbfsvm_acc = rbfsvm.score(eval_data, eval_labels)
+    lsvm_acc = lsvm.score(eval_data, eval_labels)
+    mlp_acc = mlp.score(eval_data, eval_labels)
+
+    fold_accuracy.append((lsvm_acc, rbfsvm_acc, mlp_acc))
+
+print fold_accuracy
+print(np.mean(fold_accuracy, axis=0))
+
 
 # Steady State Genetic Algorithm
-# No Innovations: 95, 25, 2, 2, 1, 1, False, 5000, 10
+# No Innovations: 95, 25, 2, 2, 1, 1, 5, False, 5000, 10
 SSGA_fm_length = 95
 SSGA_number_of_fms = 25
-SSGA_number_of_potential_parents = 2
-SSGA_number_of_parents = 2
+SSGA_number_of_potential_parents = 10
+SSGA_number_of_parents = 10
 SSGA_number_of_children = 1
 SSGA_number_to_replace = 1
-SSGA_is_replacement_combined = False
+SSGA_mutation_rate = 1
+SSGA_is_replacement_combined = True
 SSGA_number_of_iterations = 5000
 SSGA_number_of_runs = 10
 SSGA_last_generation_ratings = []
@@ -895,7 +957,7 @@ for index in range(SSGA_number_of_runs):
         SSGA_parent_list = tournament_select_parents(SSGA_generation_list_rated, SSGA_number_of_parents,
                                                      SSGA_number_of_potential_parents)
         # 1 child is created from the 2 selected parents
-        SSGA_child_list = procreate(SSGA_parent_list, SSGA_number_of_children)
+        SSGA_child_list = procreate(SSGA_parent_list, SSGA_number_of_children, SSGA_mutation_rate)
 
         # the child is rated by accuracy
         SSGA_child_list_rated = evaluation(feature_vectors, authors, SSGA_child_list)
@@ -918,7 +980,7 @@ for index in range(SSGA_number_of_runs):
         SSGA_iterations = SSGA_iterations - len(SSGA_child_list)
 
     # add average rating of last generation to list
-    SSGA_last_generation_ratings.append(SSGA_ratings_over_time[-1])
+    SSGA_last_generation_ratings.append(max(SSGA_ratings_over_time))
     print SSGA_ratings_over_time
 
 # get average of the final rating of each generation
@@ -940,14 +1002,16 @@ print "SSGA Max Rating: ", SSGA_final_max
 print "SSGA Average Rating: ", SSGA_final_average
 
 # Elitist Genetic Algorithm
-# No Innovations: 95, 25, 2, 2, 1, 24, False, 5000, 10
+# No Innovations: 95, 25, 2, 2, 1, 24, 5, False, 5000, 10
+
 EGA_fm_length = 95
 EGA_number_of_fms = 25
-EGA_number_of_potential_parents = 2
+EGA_number_of_potential_parents = 10
 EGA_number_of_parents = 2
 EGA_number_of_children = 1
 EGA_number_to_replace = 24
-EGA_is_replacement_combined = False
+EGA_mutation_rate = 1
+EGA_is_replacement_combined = True
 EGA_number_of_iterations = 5000
 EGA_number_of_runs = 10
 EGA_last_generation_ratings = []
@@ -994,7 +1058,7 @@ for index in range(EGA_number_of_runs):
             EGA_parent_list = tournament_select_parents(EGA_generation_list_rated, EGA_number_of_parents,
                                                         EGA_number_of_potential_parents)
             # 1 child is created from the 2 selected parents
-            EGA_child = procreate(EGA_parent_list, EGA_number_of_children)
+            EGA_child = procreate(EGA_parent_list, EGA_number_of_children, EGA_mutation_rate)
             EGA_single_child = EGA_child[0]
             # child is added to child list
             EGA_child_list.append(EGA_single_child)
@@ -1020,7 +1084,7 @@ for index in range(EGA_number_of_runs):
         EGA_iterations = EGA_iterations - len(EGA_child_list)
 
     # add average rating of last generation to list
-    EGA_last_generation_ratings.append(EGA_ratings_over_time[-1])
+    EGA_last_generation_ratings.append(max(EGA_ratings_over_time))
     print EGA_ratings_over_time
 
 # get average of the final rating of each generation
@@ -1042,12 +1106,13 @@ print "EGA Max Rating: ", EGA_final_max
 print "EGA Average Rating: ", EGA_final_average
 
 # Estimation of Distribution Algorithm
-# No Innovations: 95, 25, 12, 24, 24, False, 5000, 10
+# No Innovations: 95, 25, 12, 24, 24, 5, False, 5000, 10
 EDA_fm_length = 95
 EDA_number_of_fms = 25
-EDA_number_of_parents = 12
-EDA_number_of_children = 24
+EDA_number_of_parents = 6
+EDA_number_of_children = 48
 EDA_number_to_replace = 24
+EDA_mutation_rate = 1
 EDA_is_replacement_combined = False
 EDA_number_of_iterations = 5000
 EDA_number_of_runs = 10
@@ -1092,7 +1157,7 @@ for index in range(EDA_number_of_runs):
         # 12 best parents are selected from the feature mask generation
         EDA_parent_list = select_best_parents(EDA_generation_list, EDA_number_of_parents)
         # 24 children are created from the 12 selected parents
-        EDA_child_list = procreate(EDA_parent_list, EDA_number_of_children)
+        EDA_child_list = procreate(EDA_parent_list, EDA_number_of_children, EDA_mutation_rate)
 
         # the children are rated by accuracy
         EDA_child_list_rated = evaluation(feature_vectors, authors, EDA_child_list)
@@ -1115,7 +1180,7 @@ for index in range(EDA_number_of_runs):
         EDA_iterations = EDA_iterations - len(EDA_child_list)
 
     # add average rating of last generation to list
-    EDA_last_generation_ratings.append(EDA_ratings_over_time[-1])
+    EDA_last_generation_ratings.append(max(EDA_ratings_over_time))
     print EDA_ratings_over_time
 
 # get average of the final rating of each generation
