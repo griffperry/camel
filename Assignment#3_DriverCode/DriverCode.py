@@ -66,6 +66,8 @@ print(np.mean(fold_accuracy, axis=0))
 authors = Y
 feature_vectors = CU_X
 
+# create CASIS file
+file = open("CASISGA.txt","w+")
 
 # Steady State Genetic Algorithm
 # No Innovations: 95, 25, 2, 2, 1, 1, 5, False, 5000, 10
@@ -81,7 +83,7 @@ SSGA_number_of_iterations = 5000
 SSGA_number_of_runs = 10
 SSGA_last_generation_ratings = []
 
-print "Steady State Genetic Algorithm"
+file.write("Steady State Genetic Algorithm\n")
 
 # run SSGA x number of times
 for index in range(SSGA_number_of_runs):
@@ -140,11 +142,21 @@ for index in range(SSGA_number_of_runs):
         SSGA_ratings_over_time.append(SSGA_average)
 
         # decrement the number of iterations by the number of children created
-        SSGA_iterations = SSGA_iterations - len(SSGA_child_list)
+        SSGA_iterations = SSGA_iterations - 1
 
     # add average rating of last generation to list
     SSGA_last_generation_ratings.append(max(SSGA_ratings_over_time))
-    print SSGA_ratings_over_time
+
+    # write pertinent information into the CASIS file
+    for rating in SSGA_ratings_over_time:
+        file.write('%s' % rating)
+        file.write(", ")
+    file.write("\n")
+    for fm in SSGA_generation_list_rated:
+        print fm
+        file.write('%s' % fm)
+        file.write("\n")
+    file.write("\n")
 
 # get average of the final rating of each generation
 SSGA_final_sum = 0
@@ -160,9 +172,15 @@ for rat in SSGA_last_generation_ratings:
 # gets average of final ratings
 SSGA_final_average = SSGA_final_sum / len(SSGA_last_generation_ratings)
 
-print "SSGA Ratings for Each Generation: ", SSGA_last_generation_ratings
-print "SSGA Max Rating: ", SSGA_final_max
-print "SSGA Average Rating: ", SSGA_final_average
+# write pertinent information into CASIS file
+file.write("\n\nSSGA Ratings for Each Generation: ")
+for rating in SSGA_last_generation_ratings:
+    file.write('%s' % rating)
+    file.write(", ")
+file.write("\nSSGA Max Rating: ")
+file.write('%s' % SSGA_final_max)
+file.write("\nSSGA Average Rating: ")
+file.write('%s' % SSGA_final_average)
 
 # Elitist Genetic Algorithm
 # No Innovations: 95, 25, 2, 2, 1, 24, 5, False, 5000, 10
@@ -179,7 +197,7 @@ EGA_number_of_iterations = 5000
 EGA_number_of_runs = 10
 EGA_last_generation_ratings = []
 
-print "\nElitist Genetic Algorithm"
+file.write("\n\nElitist Genetic Algorithm\n")
 
 # run EGA x number of times
 for index in range(EGA_number_of_runs):
@@ -244,11 +262,21 @@ for index in range(EGA_number_of_runs):
         EGA_ratings_over_time.append(EGA_average)
 
         # decrement the number of iterations by the number of children created
-        EGA_iterations = EGA_iterations - len(EGA_child_list)
+        EGA_iterations = EGA_iterations - 24
 
     # add average rating of last generation to list
     EGA_last_generation_ratings.append(max(EGA_ratings_over_time))
-    print EGA_ratings_over_time
+
+    # write pertinent information into CASIS file
+    for rating in EGA_ratings_over_time:
+        file.write('%s' % rating)
+        file.write(", ")
+    file.write("\n")
+    for fm in EGA_generation_list_rated:
+        print fm
+        file.write('%s' % fm)
+        file.write("\n")
+    file.write("\n")
 
 # get average of the final rating of each generation
 EGA_final_sum = 0
@@ -264,9 +292,15 @@ for rat in EGA_last_generation_ratings:
 # gets average of final ratings
 EGA_final_average = EGA_final_sum / len(EGA_last_generation_ratings)
 
-print "EGA Ratings for Each Generation: ", EGA_last_generation_ratings
-print "EGA Max Rating: ", EGA_final_max
-print "EGA Average Rating: ", EGA_final_average
+# write pertinent information into CASIS file
+file.write("\n\nEGA Ratings for Each Generation: ")
+for rating in EGA_last_generation_ratings:
+    file.write('%s' % rating)
+    file.write(", ")
+file.write("\nEGA Max Rating: ")
+file.write('%s' % EGA_final_max)
+file.write("\nEGA Average Rating: ")
+file.write('%s' % EGA_final_average)
 
 # Estimation of Distribution Algorithm
 # No Innovations: 95, 25, 12, 24, 24, 5, False, 5000, 10
@@ -281,7 +315,7 @@ EDA_number_of_iterations = 5000
 EDA_number_of_runs = 10
 EDA_last_generation_ratings = []
 
-print "\nEstimation of Distribution Algorithm"
+file.write("\n\nEstimation of Distribution Algorithm\n")
 
 # run EDA x number of times
 for index in range(EDA_number_of_runs):
@@ -340,11 +374,20 @@ for index in range(EDA_number_of_runs):
         EDA_ratings_over_time.append(EDA_average)
 
         # decrement the number of iterations by the number of children created
-        EDA_iterations = EDA_iterations - len(EDA_child_list)
+        EDA_iterations = EDA_iterations - 24
 
     # add average rating of last generation to list
     EDA_last_generation_ratings.append(max(EDA_ratings_over_time))
-    print EDA_ratings_over_time
+
+    # write pertinent information to CASIS file
+    for rating in EDA_ratings_over_time:
+        file.write('%s' % rating)
+        file.write(", ")
+    file.write("\n")
+    for fm in EDA_generation_list_rated:
+        file.write('%s' % fm)
+        file.write("\n")
+    file.write("\n")
 
 # get average of the final rating of each generation
 EDA_final_sum = 0
@@ -360,7 +403,15 @@ for rat in EDA_last_generation_ratings:
 # gets average of final ratings
 EDA_final_average = EDA_final_sum / len(EDA_last_generation_ratings)
 
-print "EDA Ratings for Each Generation: ", EDA_last_generation_ratings
-print "EDA Max Rating: ", EDA_final_max
-print "EDA Average Rating: ", EDA_final_average
+# write pertinent information to CASIS file
+file.write("\n\nEDA Ratings for Each Generation: ")
+for rating in EDA_last_generation_ratings:
+    file.write('%s' % rating)
+    file.write(", ")
+file.write("\nEDA Max Rating: ")
+file.write('%s' % EDA_final_max)
+file.write("\nEDA Average Rating: ")
+file.write('%s' % EDA_final_average)
 
+# close CASIS file
+file.close()
