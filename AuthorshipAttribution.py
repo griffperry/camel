@@ -839,7 +839,7 @@ print average_sentences(week_1_author_10, week_2_author_10, week_3_author_10)
 #write_to_feature_vector_file("SEC_Sportswriters_Feature_Vectors.txt", feature_vector_list)
 #normalize_fv("SEC_Sportswriters_Normalized_Feature_Vectors.txt", feature_vector_list)
 
-
+'''
 # Separating Authors and Feature Vectors
 authors = []
 for i in range(len(feature_vector_list)):
@@ -1251,4 +1251,4 @@ file.write("\nEDA Average Rating: ")
 file.write('%s' % EDA_final_average)
 
 # close SEC file
-file.close()
+file.close()'''
