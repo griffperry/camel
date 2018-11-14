@@ -100,6 +100,9 @@ def evaluation(fv_list, author_list, fm_list):
 
             lsvm_acc = lsvm.score(eval_data, eval_labels)
 
+            print lsvm.decision_function(eval_data)
+            print lsvm.predict(eval_data)
+
             fold_accuracy.append(lsvm_acc)
 
         # get the accuracy of a fold

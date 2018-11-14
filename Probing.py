@@ -1,3 +1,4 @@
+import random
 import Data_Utils
 from sklearn.preprocessing import StandardScaler, normalize
 from sklearn import svm
@@ -33,11 +34,10 @@ def initialize_tfv_population(num_tfv, tfv_len):
 
 # evaluates how well feature masks perform, where the rating is the accuracy
 # inputs: list of feature vectors, list of test feature vectors, author list, feature mask
-# return: accuracy, decision function
+# return: decision functions, predictions
 def evaluation_tfv(fv_list, tfv_list, author_list, fm):
     masked_fv_list = []
     masked_tfv_list = []
-    decision_functions = []
 
     # convert feature mask to numpy array
     np_fm = np.array(fm)
@@ -65,60 +65,46 @@ def evaluation_tfv(fv_list, tfv_list, author_list, fm):
     np_tfv_list = np.array(masked_tfv_list)
     np_author_list = np.array(author_list)
 
-    CU_X = np_fv_list
-    Y = np_author_list
-
     lsvm = svm.LinearSVC()
-
-    skf = StratifiedKFold(n_splits=4, shuffle=True, random_state=0)
-    fold_accuracy = []
 
     scaler = StandardScaler()
     tfidf = TfidfTransformer(norm=None)
     dense = Data_Utils.DenseTransformer()
 
-    for train, test in skf.split(CU_X, Y):
-        # train split
-        CU_train_data = CU_X[train]
-        train_labels = Y[train]
+    # train split
+    CU_train_data = np_fv_list
+    train_labels = np_author_list
 
-        # test split
-        CU_eval_data = CU_X[test]
-        eval_labels = Y[test]
+    # test split
+    CU_eval_data = np_tfv_list
 
-        # tf-idf
-        tfidf.fit(CU_train_data)
-        CU_train_data = dense.transform(tfidf.transform(CU_train_data))
-        CU_eval_data = dense.transform(tfidf.transform(CU_eval_data))
+    # tf-idf
+    tfidf.fit(CU_train_data)
+    CU_train_data = dense.transform(tfidf.transform(CU_train_data))
+    CU_eval_data = dense.transform(tfidf.transform(CU_eval_data))
 
-        # standardization
-        scaler.fit(CU_train_data)
-        CU_train_data = scaler.transform(CU_train_data)
-        CU_eval_data = scaler.transform(CU_eval_data)
+    # standardization
+    scaler.fit(CU_train_data)
+    CU_train_data = scaler.transform(CU_train_data)
+    CU_eval_data = scaler.transform(CU_eval_data)
 
-        # normalization
-        CU_train_data = normalize(CU_train_data)
-        CU_eval_data = normalize(CU_eval_data)
+    # normalization
+    CU_train_data = normalize(CU_train_data)
+    CU_eval_data = normalize(CU_eval_data)
 
-        train_data = CU_train_data
-        eval_data = CU_eval_data
+    train_data = CU_train_data
+    eval_data = CU_eval_data
 
-        # evaluation
-        lsvm.fit(train_data, train_labels)
+    # fitting
+    lsvm.fit(train_data, train_labels)
 
-        lsvm_acc = lsvm.score(eval_data, eval_labels)
+    # decision functions
+    lsvm_df = lsvm.decision_function(eval_data)
 
-        fold_accuracy.append(lsvm_acc)
+    # predictions
+    lsvm_predictions = lsvm.predict(eval_data)
 
-        # decision function
-        lsvm_df = lsvm.decision_function(eval_data)
-
-        decision_functions.append(lsvm_df)
-
-    # get the accuracy of a fold
-    rating = np.mean(fold_accuracy, axis=0)
-
-    return rating, decision_functions
+    return lsvm_df, lsvm_predictions
 
 
 # calculates evaluation function by (DF-T)^2
@@ -138,7 +124,159 @@ def evaluation_function(decision_functions, target_function):
         np_ef = np_df - np_tf
         np.power(np_ef, 2)
 
-        # add evaluation function to list
-        evaluations.append(np_ef)
+        ef_sum = sum(np_ef)
+
+        # add evaluation function sum to list
+        evaluations.append([df, ef_sum])
 
     return evaluations
+
+
+# for SSGA and EGA
+# randomly selects x (normally 2) number of parents to be chosen to procreate
+# inputs: list of test feature vectors, number of parents, number of potential parents
+# return: list of test feature vectors to act as parents
+def tournament_select_parents(tfv_list, num_parent, num_potentials):
+    potential_list = []
+    parent_list = []
+
+    # for loop to get x parents
+    for par in range(num_parent):
+        # for loop to get x potential parents
+        for pot in range(num_potentials):
+            # chooses a random test feature vector as a potential parent
+            rand = random.randint(0, len(tfv_list) - 1)
+            potential = tfv_list[rand]
+            # adds potential parent to list of potential parents
+            potential_list.append(potential)
+
+        # sort potential parents by rating
+        sorted_potential_list = sorted(potential_list, key=lambda tfv: tfv[1])
+        # select best potential parent as a parent
+        parent_list.append(sorted_potential_list[0][0])
+        # clear list of potential parents
+        potential_list = []
+
+    return parent_list
+
+
+# for EDA
+# selects x (normally 12) number of best parents to be chosen to procreate
+# inputs: list of test feature vectors, number of parents
+# return: list of test feature vectors to act as parents
+def select_best_parents(tfv_list, num_parent):
+    parent_list = []
+
+    # sorts list of feature masks by rating
+    sorted_tfv_list = sorted(tfv_list, key=lambda tfv: tfv[1])
+
+    # for loop to get best x parents
+    for index in range(num_parent):
+        # gets feature mask at index
+        parent = sorted_tfv_list[index]
+        # adds feature mask to the list of parents
+        parent_list.append(parent)
+
+    return parent_list
+
+
+# creates x number of children from a set of parents
+# inputs: list of parent test feature vectors, number of children desired
+# return: list of child test feature vectors
+def procreate(parent_tfv, num_children, mutation_rate):
+    child_tfv = []
+    child_tfv_list = []
+
+    # something is wrong if there's fewer than two parents, so return an empty list
+    if (len(parent_tfv) < 2):
+        return child_tfv_list
+
+    # first for loop creates x number of children
+    for childs in range(num_children):
+        # second for loop gets all the values of a child
+        for index in range(len(parent_tfv[0])):
+            # chooses a parent to select the value from
+            rand = random.randint(0, len(parent_tfv) - 1)
+            # gets value from parent x
+            parent = parent_tfv[rand][index]
+            # adds value to child
+            child_tfv.append(parent)
+        # adds finished child to list of children
+        child_tfv_list.append(child_tfv)
+        # clears list to start over
+        child_tfv = []
+
+    # mutates child feature masks
+    mutated_child_tfv_list = mutation(child_tfv_list, mutation_rate)
+
+    return mutated_child_tfv_list
+
+
+# called by procreate()
+# mutates child test feature vectors as a part of procreation
+# inputs: list of child test feature vectors
+# return: list of mutated child test feature vectors
+def mutation(tfv_list, mutation_rate):
+    # copies given feature masks to a new list
+    new_tfv_list = tfv_list
+
+    # first for loop goes through each feature mask in the list
+    for tfv in new_tfv_list:
+        # second for loop goes through each value of a feature mask
+        for index in range(len(tfv)):
+            # flips the value (0 to 1 or 1 to 0) x percent of the time
+            if (random.randint(1, 101) < mutation_rate + 1):
+                tfv[index] = tfv[index] ^ 1
+
+    return new_tfv_list
+
+
+# sorts parent test feature vectors and child test feature vectors according to ratings,
+# replaces x number of worst parents by x number of best children
+# inputs: list of parent test feature vectors with rating, list of child test feature vectors with rating,
+#         number of parents to be replaced (example: SSGA is 1, EGA is 24, EDA is 24)
+# return: list of test feature vectors to be the next generation
+def replacement(parent_tfv_list, child_tfv_list, num_replace, is_combined):
+    new_gen_list = []
+    new_gen_list_unrated = []
+
+    # get the number of parents that will be kept
+    num_keep = len(parent_tfv_list) - num_replace
+
+    if is_combined:
+        # creates combined list and add parent and child feature masks and ratings
+        combined_tfv_list = []
+        combined_tfv_list.extend(parent_tfv_list)
+        combined_tfv_list.extend(child_tfv_list)
+
+        # sorts combined list of feature masks by rating
+        sorted_combined_tfv_list = sorted(combined_tfv_list, key=lambda tfv: tfv[1])
+
+        # for loop gets the best x feature masks and adds them to the new generation
+        for index in range(len(parent_tfv_list)):
+            new_gen_list.append(sorted_combined_tfv_list[index])
+    else:
+        # sorts list of parent feature masks by rating
+        sorted_parent_tfv_list = sorted(parent_tfv_list, key=lambda tfv: tfv[1])
+        # sorts list of child feature masks by rating
+        sorted_child_tfv_list = sorted(child_tfv_list, key=lambda tfv: tfv[1])
+
+        # for loop gets the best x parents and adds them to the new generation
+        for index in range(num_keep):
+            new_gen_list.append(sorted_parent_tfv_list[index])
+
+        # for loop gets the best x children and adds them to the new generation
+        for index in range(num_replace):
+            new_gen_list.append(sorted_child_tfv_list[index])
+
+    # for loop creates a new list without ratings
+    for index in range(len(new_gen_list)):
+        new_gen_list_unrated.append(new_gen_list[index][0])
+
+    return new_gen_list_unrated, new_gen_list
+
+
+
+
+
+

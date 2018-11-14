@@ -1264,8 +1264,24 @@ file.close()'''
 
 test_fv = initialize_tfv_population(25, 95)
 
-for tfv in test_fv:
-    print tfv
+# Separating Authors and Feature Vectors
+authors = []
+for i in range(len(feature_vector_list)):
+    authors.append(str(feature_vector_list[i][-1]))
+
+feature_vectors = list(feature_vector_list)
+for i in range(len(feature_vector_list)):
+    del feature_vectors[i][-1]
+
+feature_mask = [1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0]
+
+df, p = evaluation_tfv(feature_vectors, test_fv, authors, feature_mask)
+print df
+print p
+
+target = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+
+evaluation_function
 
 
 
