@@ -5,11 +5,38 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.model_selection import StratifiedKFold
 import numpy as np
 
+
+# initializes the beginning population of test feature vectors
+# inputs: number of test feature vectors desired, length of test feature vectors
+# return: list of test feature vectors (list of lists)
+def initialize_tfv_population(num_tfv, tfv_len):
+    count = 0
+    tfv = []
+    tfv_list = []
+
+    # while loop to get x number of test feature vectors
+    while (count < num_tfv):
+        # creates a randomly populated test feature vector with values between -10,000 and 10,000
+        test_feature_vector = np.random.randint(-10000, high=10001, size=tfv_len)
+        # divides test feature vector by 10,000 so the values range between -1 and 1
+        for index in test_feature_vector:
+            tfv.append(index / 10000.0)
+        # adds a completed test feature vector to list
+        tfv_list.append(tfv)
+        # increments count
+        count = count + 1
+        # clears test feature vector
+        tfv = []
+
+    return tfv_list
+
+
 # evaluates how well feature masks perform, where the rating is the accuracy
-# inputs: list of feature vectors, list of authors, feature mask
+# inputs: list of feature vectors, list of test feature vectors, author list, feature mask
 # return: accuracy, decision function
-def evaluation(fv_list, author_list, fm):
+def evaluation_tfv(fv_list, tfv_list, author_list, fm):
     masked_fv_list = []
+    masked_tfv_list = []
     decision_functions = []
 
     # convert feature mask to numpy array
@@ -24,8 +51,18 @@ def evaluation(fv_list, author_list, fm):
         # adds masked feature vectors to masked feature vector list
         masked_fv_list.append(masked_fv)
 
-    # converts feature vector and author lists to numpy arrays
+    # for loop goes through each test feature vector in the list
+    for tfv in tfv_list:
+        # convert test feature vector to numpy array
+        np_tfv = np.array(tfv)
+        # apply mask to test feature vector
+        masked_tfv = np_fm * np_tfv
+        # adds masked test feature vectors to masked test feature vector list
+        masked_tfv_list.append(masked_tfv)
+
+    # converts feature vector, test feature vector, and author lists to numpy arrays
     np_fv_list = np.array(masked_fv_list)
+    np_tfv_list = np.array(masked_tfv_list)
     np_author_list = np.array(author_list)
 
     CU_X = np_fv_list

@@ -13,6 +13,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.model_selection import StratifiedKFold
 import numpy as np
+from Probing import initialize_tfv_population, evaluation_tfv, evaluation_function
 
 
 #read in text files
@@ -796,6 +797,8 @@ def CASIS25_display_results_of_GRNN_with_leave_one_out(play_list):
 
     print 'GRNN Accuracy: ', str((correct / float(len(play_list))) * 100.0) + '%'
 
+# PROJECT 1
+
 """
 print average_chars(week_1_author_1, week_2_author_1, week_3_author_1)
 print average_chars(week_1_author_2, week_2_author_2, week_3_author_2)
@@ -831,6 +834,8 @@ print average_sentences(week_1_author_9, week_2_author_9, week_3_author_9)
 print average_sentences(week_1_author_10, week_2_author_10, week_3_author_10)
 """
 
+# PROJECT 2
+
 #leave_one_out_knn(feature_vector_list)
 #leave_one_out_wknn(feature_vector_list)
 #display_results_of_GRNN_with_leave_one_out(feature_vector_list)
@@ -839,6 +844,8 @@ print average_sentences(week_1_author_10, week_2_author_10, week_3_author_10)
 #normalize_fv("Test_Normalized_Feature_Vectors.txt", test_list)
 #write_to_feature_vector_file("SEC_Sportswriters_Feature_Vectors.txt", feature_vector_list)
 #normalize_fv("SEC_Sportswriters_Normalized_Feature_Vectors.txt", feature_vector_list)
+
+# PROJECT 3
 
 '''
 # Separating Authors and Feature Vectors
@@ -1253,3 +1260,18 @@ file.write('%s' % EDA_final_average)
 
 # close SEC file
 file.close()'''
+
+
+test_fv = initialize_tfv_population(25, 95)
+
+for tfv in test_fv:
+    print tfv
+
+
+
+
+
+
+
+
+
