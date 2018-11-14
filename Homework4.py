@@ -1,5 +1,5 @@
 # Leah, Steph, Griff (Unofficial group name: LSG)
-# COMP 7976 Computation Intellegence with Adversarial Machine Learning
+# COMP 7976 Computation Intelligence with Adversarial Machine Learning
 # Homework4
 #
 # Task: Make 3 feature vectors, that associate with 1, 2, and 3 authors.
@@ -8,38 +8,35 @@ import ast
 import numpy.random as nprando
 
 with open("Test_Normalized_feature_Vectors.txt", "r") as f:
-   fvs = ast.literal_eval(f.readline())
+    fvs = ast.literal_eval(f.readline())
 
-  
 # Parameters: takes a feature vector
 # rounds the values to either a 0 or a 1
 # returns a feature vector
-def Round_To_Binary(fv):
+def round_to_binary(fv):
     
     fv = ['%.f' % f for f in fv]
     
     return fv
 
 
-
-    
-
 # Parameters: takes in two feature vectors
 # This  takes two feature vectors and returns the a vector of similiar elements 
 # between the two.
 # returns: a fv
-def Compare_List(fv1, fv2):
+def compare_list(fv1, fv2):
     
     fv3 = set(fv1).intersection(fv2)
     
     return fv3
 
+
 # Parameters: List of all the feature vectors, a target fv, the prediction vector
-# Takes in this list of feature vectures and compares it to the target feature vector.
-# Determine how similiar each feature vector is the target by the values 1,0 or -1
-# Basically our descision function simplified
+# Takes in this list of feature vectors and compares it to the target feature vector.
+# Determine how similar each feature vector is the target by the values 1,0 or -1
+# Basically our decision function simplified
 # Returns: a list of size twelve with either a 1, 0 or -1
-def Predict_Author(fvs, targetfv, fv):
+def predict_author(fvs, targetfv, fv):
     return fv
 
 
@@ -59,10 +56,11 @@ print random_list_maker()
 
 # Parameters: the single feature vector we want to change
 # this function will do some modification to the feature vector in order to make
-# our decision funtion choose it.
+# our decision fucntion choose it.
 # return modified fv
 def change_one(fv):
     return fv
+
 
 # Parameters: A list of feature vectors 2 or 3
 # this will change multiple fvs in some way but it will change them so that they
