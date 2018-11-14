@@ -21,7 +21,7 @@ def round_to_binary(fv):
 
 
 # Parameters: takes in two feature vectors
-# This  takes two feature vectors and returns the a vector of similiar elements 
+# This takes two feature vectors and returns a vector of similar elements
 # between the two.
 # returns: a fv
 def compare_list(fv1, fv2):
@@ -56,7 +56,7 @@ print random_list_maker()
 
 # Parameters: the single feature vector we want to change
 # this function will do some modification to the feature vector in order to make
-# our decision fucntion choose it.
+# our decision function choose it.
 # return modified fv
 def change_one(fv):
     return fv

@@ -43,13 +43,11 @@ def compute_fire_strengths(index, test_set, training_set, sigma):
     while i < 12:
         dq.append(0)
         i += 1
-    print dq
 
     k = 0
     practice_set = []
     if (k != 0):
         practice_set = getNeighbors(training_set, test_set, k)
-        print practice_set
 
     else:
         practice_set = training_set
@@ -123,7 +121,6 @@ def compute_fire_strengths_CASIS25(index, test_set, training_set, sigma):
     practice_set = []
     if (k != 0):
         practice_set = getNeighbors(training_set, test_set, k)
-        print practice_set
 
     else:
         practice_set = training_set
