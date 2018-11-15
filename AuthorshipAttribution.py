@@ -999,7 +999,6 @@ for index in range(SSGA_number_of_runs):
         file.write(", ")
     file.write("\n")
     for fm in SSGA_generation_list_rated:
-        print fm
         file.write('%s' % fm)
         file.write("\n")
     file.write("\n")
@@ -1030,7 +1029,6 @@ file.write('%s' % SSGA_final_average)
 
 # Elitist Genetic Algorithm
 # No Innovations: 95, 25, 2, 2, 1, 24, 5, False, 5000, 10
-
 EGA_fm_length = 95
 EGA_number_of_fms = 25
 EGA_number_of_potential_parents = 10
@@ -1093,7 +1091,7 @@ for index in range(EGA_number_of_runs):
         # the children are rated by accuracy
         EGA_child_list_rated = evaluation(feature_vectors, authors, EGA_child_list)
 
-        # the child replaces the worst 24 individuals in the generation
+        # the children replace the worst 24 individuals in the generation
         EGA_generation_list, EGA_generation_list_rated = replacement(EGA_generation_list_rated, EGA_child_list_rated,
                                                                      EGA_number_to_replace, EGA_is_replacement_combined)
 
@@ -1119,7 +1117,6 @@ for index in range(EGA_number_of_runs):
         file.write(", ")
     file.write("\n")
     for fm in EGA_generation_list_rated:
-        print fm
         file.write('%s' % fm)
         file.write("\n")
     file.write("\n")
@@ -1263,6 +1260,11 @@ file.write('%s' % EDA_final_average)
 file.close()'''
 
 
+
+
+
+
+
 # Separating Authors and Feature Vectors
 authors = []
 for i in range(len(feature_vector_list)):
@@ -1274,7 +1276,7 @@ for i in range(len(feature_vector_list)):
 
 
 feature_mask = [1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0]
-target = [0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0]
+target = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]
 
 # create Probing SEC file
 file = open("ProbingSECGA.txt","w+")
@@ -1283,12 +1285,12 @@ file = open("ProbingSECGA.txt","w+")
 # No Innovations: 95, 25, 2, 2, 1, 1, 5, False, 5000, 10
 SSGA_tfv_length = 95
 SSGA_number_of_tfvs = 25
-SSGA_number_of_potential_parents = 2
-SSGA_number_of_parents = 2
+SSGA_number_of_potential_parents = 10
+SSGA_number_of_parents = 10
 SSGA_number_of_children = 1
 SSGA_number_to_replace = 1
-SSGA_mutation_rate = 5
-SSGA_is_replacement_combined = False
+SSGA_mutation_rate = 1
+SSGA_is_replacement_combined = True
 SSGA_number_of_iterations = 5000
 SSGA_number_of_runs = 10
 SSGA_last_generation_ratings = []
@@ -1331,11 +1333,12 @@ for index in range(SSGA_number_of_runs):
         # 2 parents are randomly selected from the feature mask generation
         SSGA_parent_list = tournament_select_parents_tfv(SSGA_generation_list_rated, SSGA_number_of_parents,
                                                      SSGA_number_of_potential_parents)
+
         # 1 child is created from the 2 selected parents
         SSGA_child_list = procreate_tfv(SSGA_parent_list, SSGA_number_of_children, SSGA_mutation_rate)
 
         # the child is rated by accuracy
-        SSGA_child_list_rated = evaluation_tfv(feature_vectors, SSGA_generation_list, authors, feature_mask, target)
+        SSGA_child_list_rated = evaluation_tfv(feature_vectors, SSGA_child_list, authors, feature_mask, target)
 
         # the child replaces the worst individual in the generation
         SSGA_generation_list, SSGA_generation_list_rated = replacement_tfv(SSGA_generation_list_rated, SSGA_child_list_rated,
@@ -1355,7 +1358,7 @@ for index in range(SSGA_number_of_runs):
         SSGA_iterations = SSGA_iterations - 1
 
     # add average rating of last generation to list
-    SSGA_last_generation_ratings.append(max(SSGA_ratings_over_time))
+    SSGA_last_generation_ratings.append(min(SSGA_ratings_over_time))
 
     # write pertinent information into SEC file
     for rating in SSGA_ratings_over_time:
@@ -1369,15 +1372,15 @@ for index in range(SSGA_number_of_runs):
 
 # get average of the final rating of each generation
 SSGA_final_sum = 0
-SSGA_final_max = 0
+SSGA_final_min = 0
 
 # for loop goes through each rating
 for rat in SSGA_last_generation_ratings:
     # gets sum of final ratings
     SSGA_final_sum = SSGA_final_sum + rat
-    # gets max value of final ratings
-    if (rat > SSGA_final_max):
-        SSGA_final_max = rat
+    # gets min value of final ratings
+    if (rat < SSGA_final_min):
+        SSGA_final_min = rat
 # gets average of final ratings
 SSGA_final_average = SSGA_final_sum / len(SSGA_last_generation_ratings)
 
@@ -1386,17 +1389,241 @@ file.write("\n\nSSGA Ratings for Each Generation: ")
 for rating in SSGA_last_generation_ratings:
     file.write('%s' % rating)
     file.write(", ")
-file.write("\nSSGA Max Rating: ")
-file.write('%s' % SSGA_final_max)
+file.write("\nSSGA Min Rating: ")
+file.write('%s' % SSGA_final_min)
 file.write("\nSSGA Average Rating: ")
 file.write('%s' % SSGA_final_average)
 
 
+# Elitist Genetic Algorithm for Probing
+# No Innovations: 95, 25, 2, 2, 1, 24, 5, False, 5000, 10
+EGA_tfv_length = 95
+EGA_number_of_tfvs = 25
+EGA_number_of_potential_parents = 10
+EGA_number_of_parents = 2
+EGA_number_of_children = 1
+EGA_number_to_replace = 24
+EGA_mutation_rate = 1
+EGA_is_replacement_combined = True
+EGA_number_of_iterations = 5000
+EGA_number_of_runs = 10
+EGA_last_generation_ratings = []
+
+file.write("\n\nElitist Genetic Algorithm\n")
+
+# run EGA x number of times
+for index in range(EGA_number_of_runs):
+    EGA_best_ratings = []
+    EGA_ratings_over_time = []
+    EGA_sum = 0
+
+    # initialize the test feature vector population
+    EGA_generation_list = initialize_tfv_population(EGA_number_of_tfvs, EGA_tfv_length)
+
+    # the initial generation is rated by accuracy
+    EGA_generation_list_rated = evaluation_tfv(feature_vectors, EGA_generation_list, authors, feature_mask, target)
+
+    # gets sum of all test feature vector ratings
+    for rating in EGA_generation_list_rated:
+        EGA_sum = EGA_sum + rating[1]
+
+    # gets average of all test feature vector ratings
+    EGA_average = EGA_sum / len(EGA_generation_list_rated)
+
+    # adds rating average to rating list
+    EGA_ratings_over_time.append(EGA_average)
+
+    # initialize iteration number
+    EGA_iterations = EGA_number_of_iterations
+
+    # decrement the number of iterations by the number of test feature vectors created
+    EGA_iterations = EGA_iterations - EGA_number_of_tfvs
+
+    # while loop makes sure that the correct number of evaluations have been performed
+    while (EGA_iterations > 0):
+        EGA_sum = 0
+        EGA_child_list = []
+        #print EGA_iterations
+
+        for index in range(EGA_number_to_replace):
+            # 2 parents are randomly selected from the feature mask generation
+            EGA_parent_list = tournament_select_parents_tfv(EGA_generation_list_rated, EGA_number_of_parents,
+                                                         EGA_number_of_potential_parents)
+            # 1 child is created from the 2 selected parents
+            EGA_child = procreate_tfv(EGA_parent_list, EGA_number_of_children, EGA_mutation_rate)
+            EGA_single_child = EGA_child[0]
+            # child is added to child list
+            EGA_child_list.append(EGA_single_child)
+
+        # the children are rated by accuracy
+        EGA_child_list_rated = evaluation_tfv(feature_vectors, EGA_child_list, authors, feature_mask, target)
+
+        # the children replace the worst 24 individuals in the generation
+        EGA_generation_list, EGA_generation_list_rated = replacement_tfv(EGA_generation_list_rated, EGA_child_list_rated,
+                                                                       EGA_number_to_replace, EGA_is_replacement_combined)
+
+        # gets sum of all test feature vector ratings
+        for rating in EGA_generation_list_rated:
+            EGA_sum = EGA_sum + rating[1]
+
+        # gets average of all test feature vector ratings
+        EGA_average = EGA_sum / len(EGA_generation_list_rated)
+
+        # adds rating average to rating list
+        EGA_ratings_over_time.append(EGA_average)
+
+        # decrement the number of iterations by the number of children created
+        EGA_iterations = EGA_iterations - 24
+
+    # add average rating of last generation to list
+    EGA_last_generation_ratings.append(min(EGA_ratings_over_time))
+
+    # write pertinent information into SEC file
+    for rating in EGA_ratings_over_time:
+        file.write('%s' % rating)
+        file.write(", ")
+    file.write("\n")
+    for fm in EGA_generation_list_rated:
+        file.write('%s' % fm)
+        file.write("\n")
+    file.write("\n")
+
+# get average of the final rating of each generation
+EGA_final_sum = 0
+EGA_final_min = 0
+
+# for loop goes through each rating
+for rat in EGA_last_generation_ratings:
+    # gets sum of final ratings
+    EGA_final_sum = EGA_final_sum + rat
+    # gets min value of final ratings
+    if (rat < EGA_final_min):
+        EGA_final_min = rat
+# gets average of final ratings
+EGA_final_average = EGA_final_sum / len(EGA_last_generation_ratings)
+
+# write pertinent information into SEC file
+file.write("\n\nEGA Ratings for Each Generation: ")
+for rating in EGA_last_generation_ratings:
+    file.write('%s' % rating)
+    file.write(", ")
+file.write("\nEGA Min Rating: ")
+file.write('%s' % EGA_final_min)
+file.write("\nEGA Average Rating: ")
+file.write('%s' % EGA_final_average)
 
 
+# Estimation of Distribution Algorithm for Probing
+# No Innovations: 95, 25, 12, 24, 24, 5, False, 5000, 10
+EDA_tfv_length = 95
+EDA_number_of_tfvs = 25
+EDA_number_of_parents = 6
+EDA_number_of_children = 48
+EDA_number_to_replace = 24
+EDA_mutation_rate = 1
+EDA_is_replacement_combined = False
+EDA_number_of_iterations = 5000
+EDA_number_of_runs = 10
+EDA_last_generation_ratings = []
 
+file.write("\n\nEstimation of Distribution Algorithm\n")
 
+# run EDA x number of times
+for index in range(EDA_number_of_runs):
+    EDA_best_ratings = []
+    EDA_ratings_over_time = []
+    EDA_sum = 0
 
+    # initialize the test feature vector population
+    EDA_generation_list = initialize_tfv_population(EDA_number_of_tfvs, EDA_tfv_length)
 
+    # the initial generation is rated by accuracy
+    EDA_generation_list_rated = evaluation_tfv(feature_vectors, EDA_generation_list, authors, feature_mask, target)
+
+    # gets sum of all test feature vector ratings
+    for rating in EDA_generation_list_rated:
+        EDA_sum = EDA_sum + rating[1]
+
+    # gets average of all test feature vector ratings
+    EDA_average = EDA_sum / len(EDA_generation_list_rated)
+
+    # adds rating average to rating list
+    EDA_ratings_over_time.append(EDA_average)
+
+    # initialize iteration number
+    EDA_iterations = EDA_number_of_iterations
+
+    # decrement the number of iterations by the number of test feature vectors created
+    EDA_iterations = EDA_iterations - EDA_number_of_tfvs
+
+    # while loop makes sure that the correct number of evaluations have been performed
+    while (EDA_iterations > 0):
+        EDA_sum = 0
+        #print EDA_iterations
+
+        # 12 best parents are selected from the feature mask generation
+        EDA_parent_list = select_best_parents_tfv(EDA_generation_list, EDA_number_of_parents)
+        # 24 children are created from the 12 selected parents
+        EDA_child_list = procreate_tfv(EDA_parent_list, EDA_number_of_children, EDA_mutation_rate)
+
+        # the children are rated by accuracy
+        EDA_child_list_rated = evaluation_tfv(feature_vectors, EDA_child_list, authors, feature_mask, target)
+
+        # the children replace the worst 24 individuals in the generation
+        EDA_generation_list, EDA_generation_list_rated = replacement_tfv(EDA_generation_list_rated, EDA_child_list_rated,
+                                                                       EDA_number_to_replace, EDA_is_replacement_combined)
+
+        # gets sum of all test feature vector ratings
+        for rating in EDA_generation_list_rated:
+            EDA_sum = EDA_sum + rating[1]
+
+        # gets average of all test feature vector ratings
+        EDA_average = EDA_sum / len(EDA_generation_list_rated)
+
+        # adds rating average to rating list
+        EDA_ratings_over_time.append(EDA_average)
+
+        # decrement the number of iterations by the number of children created
+        EDA_iterations = EDA_iterations - 24
+
+    # add average rating of last generation to list
+    EDA_last_generation_ratings.append(min(EDA_ratings_over_time))
+
+    # write pertinent information into SEC file
+    for rating in EDA_ratings_over_time:
+        file.write('%s' % rating)
+        file.write(", ")
+    file.write("\n")
+    for fm in EDA_generation_list_rated:
+        file.write('%s' % fm)
+        file.write("\n")
+    file.write("\n")
+
+# get average of the final rating of each generation
+EDA_final_sum = 0
+EDA_final_min = 0
+
+# for loop goes through each rating
+for rat in EDA_last_generation_ratings:
+    # gets sum of final ratings
+    EDA_final_sum = EDA_final_sum + rat
+    # gets min value of final ratings
+    if (rat < EDA_final_min):
+        EDA_final_min = rat
+# gets average of final ratings
+EDA_final_average = EDA_final_sum / len(EDA_last_generation_ratings)
+
+# write pertinent information into SEC file
+file.write("\n\nEDA Ratings for Each Generation: ")
+for rating in EDA_last_generation_ratings:
+    file.write('%s' % rating)
+    file.write(", ")
+file.write("\nEDA Min Rating: ")
+file.write('%s' % EDA_final_min)
+file.write("\nEDA Average Rating: ")
+file.write('%s' % EDA_final_average)
+
+# close Probing SEC file
+file.close()
 
 

@@ -194,11 +194,12 @@ def procreate_tfv(parent_tfv, num_children, mutation_rate):
         # second for loop gets all the values of a child
         for index in range(len(parent_tfv[0])):
             # chooses two parents to select the value from
-            rand1 = random.randint(0, len(parent_tfv) - 1)
-            rand2 = random.randint(0, len(parent_tfv) - 1)
+            #rand1 = random.randint(0, len(parent_tfv) - 1)
+            #rand2 = random.randint(0, len(parent_tfv) - 1)
             # gets values from parents
-            parent1 = int(parent_tfv[rand1][index] * 10000)
-            parent2 = int(parent_tfv[rand2][index] * 10000)
+            parent1 = int(parent_tfv[0][index] * 10000)
+            parent2 = int(parent_tfv[1][index] * 10000)
+
             # gets a value near the values of the two parents
             if (parent1 > parent2):
                 alpha = int(round(0.5 * (parent1 - parent2)))
@@ -207,7 +208,8 @@ def procreate_tfv(parent_tfv, num_children, mutation_rate):
                 alpha = int(round(0.5 * (parent2 - parent1)))
                 new_value = random.randint(parent1 - alpha, parent2 + alpha)
             # adds value to child
-            child_tfv.append(new_value / 10000)
+            child_tfv.append(new_value / 10000.0)
+
         # adds finished child to list of children
         child_tfv_list.append(child_tfv)
         # clears list to start over
@@ -232,7 +234,7 @@ def mutation(tfv_list, mutation_rate):
         # second for loop goes through each value of a feature mask
         for index in range(len(tfv)):
             # gives a random value x percent of the time
-            if (random.randint(1, 101) < mutation_rate + 1):
+            if (index != 0) & (random.randint(1, 101) < mutation_rate + 1):
                 tfv[index] = random.randint(-10000, 10000) / 10000
 
     return new_tfv_list
