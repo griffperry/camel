@@ -4,8 +4,8 @@ from K_Weighted_Nearest_Neighbor import get_weighted_neighbors, get_weighted_dis
     get_weighted_accuracy
 from homework1 import read_dataset, feature_vectors, write_to_feature_vector_file, normalize_fv
 from GRNN import dist_squared, compute_fire_strengths, hf, compute_fire_strengths_CASIS25
-from GeneticAlgorithms import replacement, evaluation, procreate, tournament_select_parents, initialize_population,\
-    select_best_parents
+#from GeneticAlgorithms import replacement, evaluation, procreate, tournament_select_parents, initialize_population,\
+#    select_best_parents
 import Data_Utils
 from sklearn.preprocessing import StandardScaler, normalize
 from sklearn import svm
@@ -13,7 +13,8 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.model_selection import StratifiedKFold
 import numpy as np
-from Probing import initialize_tfv_population, evaluation_tfv, evaluation_function
+from Probing import initialize_tfv_population, evaluation_tfv, tournament_select_parents_tfv, select_best_parents_tfv,\
+    procreate_tfv, replacement_tfv
 
 
 #read in text files
@@ -1262,8 +1263,6 @@ file.write('%s' % EDA_final_average)
 file.close()'''
 
 
-test_fv = initialize_tfv_population(25, 95)
-
 # Separating Authors and Feature Vectors
 authors = []
 for i in range(len(feature_vector_list)):
@@ -1273,15 +1272,125 @@ feature_vectors = list(feature_vector_list)
 for i in range(len(feature_vector_list)):
     del feature_vectors[i][-1]
 
+
 feature_mask = [1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0]
+target = [0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0]
 
-df, p = evaluation_tfv(feature_vectors, test_fv, authors, feature_mask)
-print df
-print p
+# create Probing SEC file
+file = open("ProbingSECGA.txt","w+")
 
-target = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+# Steady State Genetic Algorithm for Probing
+# No Innovations: 95, 25, 2, 2, 1, 1, 5, False, 5000, 10
+SSGA_tfv_length = 95
+SSGA_number_of_tfvs = 25
+SSGA_number_of_potential_parents = 2
+SSGA_number_of_parents = 2
+SSGA_number_of_children = 1
+SSGA_number_to_replace = 1
+SSGA_mutation_rate = 5
+SSGA_is_replacement_combined = False
+SSGA_number_of_iterations = 5000
+SSGA_number_of_runs = 10
+SSGA_last_generation_ratings = []
 
-evaluation_function
+file.write("Steady State Genetic Algorithm\n")
+
+# run SSGA x number of times
+for index in range(SSGA_number_of_runs):
+    SSGA_best_ratings = []
+    SSGA_ratings_over_time = []
+    SSGA_sum = 0
+
+    # initialize the test feature vector population
+    SSGA_generation_list = initialize_tfv_population(SSGA_number_of_tfvs, SSGA_tfv_length)
+
+    # the initial generation is rated by accuracy
+    SSGA_generation_list_rated = evaluation_tfv(feature_vectors, SSGA_generation_list, authors, feature_mask, target)
+
+    # gets sum of all test feature vector ratings
+    for rating in SSGA_generation_list_rated:
+        SSGA_sum = SSGA_sum + rating[1]
+
+    # gets average of all test feature vector ratings
+    SSGA_average = SSGA_sum / len(SSGA_generation_list_rated)
+
+    # adds rating average to rating list
+    SSGA_ratings_over_time.append(SSGA_average)
+
+    # initialize iteration number
+    SSGA_iterations = SSGA_number_of_iterations
+
+    # decrement the number of iterations by the number of test feature vectors created
+    SSGA_iterations = SSGA_iterations - SSGA_number_of_tfvs
+
+    # while loop makes sure that the correct number of evaluations have been performed
+    while (SSGA_iterations > 0):
+        SSGA_sum = 0
+        #print SSGA_iterations
+
+        # 2 parents are randomly selected from the feature mask generation
+        SSGA_parent_list = tournament_select_parents_tfv(SSGA_generation_list_rated, SSGA_number_of_parents,
+                                                     SSGA_number_of_potential_parents)
+        # 1 child is created from the 2 selected parents
+        SSGA_child_list = procreate_tfv(SSGA_parent_list, SSGA_number_of_children, SSGA_mutation_rate)
+
+        # the child is rated by accuracy
+        SSGA_child_list_rated = evaluation_tfv(feature_vectors, SSGA_generation_list, authors, feature_mask, target)
+
+        # the child replaces the worst individual in the generation
+        SSGA_generation_list, SSGA_generation_list_rated = replacement_tfv(SSGA_generation_list_rated, SSGA_child_list_rated,
+                                                                       SSGA_number_to_replace, SSGA_is_replacement_combined)
+
+        # gets sum of all test feature vector ratings
+        for rating in SSGA_generation_list_rated:
+            SSGA_sum = SSGA_sum + rating[1]
+
+        # gets average of all test feature vector ratings
+        SSGA_average = SSGA_sum / len(SSGA_generation_list_rated)
+
+        # adds rating average to rating list
+        SSGA_ratings_over_time.append(SSGA_average)
+
+        # decrement the number of iterations by the number of children created
+        SSGA_iterations = SSGA_iterations - 1
+
+    # add average rating of last generation to list
+    SSGA_last_generation_ratings.append(max(SSGA_ratings_over_time))
+
+    # write pertinent information into SEC file
+    for rating in SSGA_ratings_over_time:
+        file.write('%s' % rating)
+        file.write(", ")
+    file.write("\n")
+    for fm in SSGA_generation_list_rated:
+        file.write('%s' % fm)
+        file.write("\n")
+    file.write("\n")
+
+# get average of the final rating of each generation
+SSGA_final_sum = 0
+SSGA_final_max = 0
+
+# for loop goes through each rating
+for rat in SSGA_last_generation_ratings:
+    # gets sum of final ratings
+    SSGA_final_sum = SSGA_final_sum + rat
+    # gets max value of final ratings
+    if (rat > SSGA_final_max):
+        SSGA_final_max = rat
+# gets average of final ratings
+SSGA_final_average = SSGA_final_sum / len(SSGA_last_generation_ratings)
+
+# write pertinent information into SEC file
+file.write("\n\nSSGA Ratings for Each Generation: ")
+for rating in SSGA_last_generation_ratings:
+    file.write('%s' % rating)
+    file.write(", ")
+file.write("\nSSGA Max Rating: ")
+file.write('%s' % SSGA_final_max)
+file.write("\nSSGA Average Rating: ")
+file.write('%s' % SSGA_final_average)
+
 
 
 

@@ -33,9 +33,9 @@ def initialize_tfv_population(num_tfv, tfv_len):
 
 
 # evaluates how well feature masks perform, where the rating is the accuracy
-# inputs: list of feature vectors, list of test feature vectors, author list, feature mask
-# return: decision functions, predictions
-def evaluation_tfv(fv_list, tfv_list, author_list, fm):
+# inputs: list of feature vectors, list of test feature vectors, author list, feature mask, target function
+# return: list of test feature vectors with evaluations
+def evaluation_tfv(fv_list, tfv_list, author_list, fm, target):
     masked_fv_list = []
     masked_tfv_list = []
 
@@ -101,42 +101,40 @@ def evaluation_tfv(fv_list, tfv_list, author_list, fm):
     # decision functions
     lsvm_df = lsvm.decision_function(eval_data)
 
-    # predictions
-    lsvm_predictions = lsvm.predict(eval_data)
+    tfv_with_eval_list = []
 
-    return lsvm_df, lsvm_predictions
+    for index in range(len(tfv_list)):
+        ef = evaluation_function(lsvm_df[index], target)
+        tfv_with_eval_list.append([masked_tfv_list[index], ef])
+
+    return tfv_with_eval_list
 
 
 # calculates evaluation function by (DF-T)^2
-# inputs: list of decision functions, target function
-# return: list of evaluation functions
-def evaluation_function(decision_functions, target_function):
-    evaluations = []
-
+# inputs: decision function, target function
+# return: sum of evaluation function
+def evaluation_function(decision_function, target_function):
     # convert target function to numpy array
     np_tf = np.array(target_function)
 
-    for df in decision_functions:
-        # convert decision function to numpy array
-        np_df = np.array(df)
+    # convert decision function to numpy array
+    np_df = np.array(decision_function)
 
-        # calculate evaluation function
-        np_ef = np_df - np_tf
-        np.power(np_ef, 2)
+    # calculate evaluation function
+    np_ef = np_df - np_tf
+    squared_ef = np.power(np_ef, 2)
 
-        ef_sum = sum(np_ef)
+    # find sum of numbers in evaluation function
+    ef_sum = sum(squared_ef)
 
-        # add evaluation function sum to list
-        evaluations.append([df, ef_sum])
-
-    return evaluations
+    return ef_sum
 
 
 # for SSGA and EGA
 # randomly selects x (normally 2) number of parents to be chosen to procreate
 # inputs: list of test feature vectors, number of parents, number of potential parents
 # return: list of test feature vectors to act as parents
-def tournament_select_parents(tfv_list, num_parent, num_potentials):
+def tournament_select_parents_tfv(tfv_list, num_parent, num_potentials):
     potential_list = []
     parent_list = []
 
@@ -164,7 +162,7 @@ def tournament_select_parents(tfv_list, num_parent, num_potentials):
 # selects x (normally 12) number of best parents to be chosen to procreate
 # inputs: list of test feature vectors, number of parents
 # return: list of test feature vectors to act as parents
-def select_best_parents(tfv_list, num_parent):
+def select_best_parents_tfv(tfv_list, num_parent):
     parent_list = []
 
     # sorts list of feature masks by rating
@@ -183,7 +181,7 @@ def select_best_parents(tfv_list, num_parent):
 # creates x number of children from a set of parents
 # inputs: list of parent test feature vectors, number of children desired
 # return: list of child test feature vectors
-def procreate(parent_tfv, num_children, mutation_rate):
+def procreate_tfv(parent_tfv, num_children, mutation_rate):
     child_tfv = []
     child_tfv_list = []
 
@@ -195,12 +193,21 @@ def procreate(parent_tfv, num_children, mutation_rate):
     for childs in range(num_children):
         # second for loop gets all the values of a child
         for index in range(len(parent_tfv[0])):
-            # chooses a parent to select the value from
-            rand = random.randint(0, len(parent_tfv) - 1)
-            # gets value from parent x
-            parent = parent_tfv[rand][index]
+            # chooses two parents to select the value from
+            rand1 = random.randint(0, len(parent_tfv) - 1)
+            rand2 = random.randint(0, len(parent_tfv) - 1)
+            # gets values from parents
+            parent1 = int(parent_tfv[rand1][index] * 10000)
+            parent2 = int(parent_tfv[rand2][index] * 10000)
+            # gets a value near the values of the two parents
+            if (parent1 > parent2):
+                alpha = int(round(0.5 * (parent1 - parent2)))
+                new_value = random.randint(parent2 - alpha, parent1 + alpha)
+            else:
+                alpha = int(round(0.5 * (parent2 - parent1)))
+                new_value = random.randint(parent1 - alpha, parent2 + alpha)
             # adds value to child
-            child_tfv.append(parent)
+            child_tfv.append(new_value / 10000)
         # adds finished child to list of children
         child_tfv_list.append(child_tfv)
         # clears list to start over
@@ -224,9 +231,9 @@ def mutation(tfv_list, mutation_rate):
     for tfv in new_tfv_list:
         # second for loop goes through each value of a feature mask
         for index in range(len(tfv)):
-            # flips the value (0 to 1 or 1 to 0) x percent of the time
+            # gives a random value x percent of the time
             if (random.randint(1, 101) < mutation_rate + 1):
-                tfv[index] = tfv[index] ^ 1
+                tfv[index] = random.randint(-10000, 10000) / 10000
 
     return new_tfv_list
 
@@ -236,7 +243,7 @@ def mutation(tfv_list, mutation_rate):
 # inputs: list of parent test feature vectors with rating, list of child test feature vectors with rating,
 #         number of parents to be replaced (example: SSGA is 1, EGA is 24, EDA is 24)
 # return: list of test feature vectors to be the next generation
-def replacement(parent_tfv_list, child_tfv_list, num_replace, is_combined):
+def replacement_tfv(parent_tfv_list, child_tfv_list, num_replace, is_combined):
     new_gen_list = []
     new_gen_list_unrated = []
 
@@ -274,9 +281,3 @@ def replacement(parent_tfv_list, child_tfv_list, num_replace, is_combined):
         new_gen_list_unrated.append(new_gen_list[index][0])
 
     return new_gen_list_unrated, new_gen_list
-
-
-
-
-
-
