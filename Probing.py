@@ -81,16 +81,16 @@ def evaluation_tfv(fv_list, tfv_list, author_list, fm, target):
     # tf-idf
     tfidf.fit(CU_train_data)
     CU_train_data = dense.transform(tfidf.transform(CU_train_data))
-    CU_eval_data = dense.transform(tfidf.transform(CU_eval_data))
+    #CU_eval_data = dense.transform(tfidf.transform(CU_eval_data))
 
     # standardization
     scaler.fit(CU_train_data)
     CU_train_data = scaler.transform(CU_train_data)
-    CU_eval_data = scaler.transform(CU_eval_data)
+    #CU_eval_data = scaler.transform(CU_eval_data)
 
     # normalization
     CU_train_data = normalize(CU_train_data)
-    CU_eval_data = normalize(CU_eval_data)
+    #CU_eval_data = normalize(CU_eval_data)
 
     train_data = CU_train_data
     eval_data = CU_eval_data

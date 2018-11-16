@@ -4,8 +4,8 @@ from K_Weighted_Nearest_Neighbor import get_weighted_neighbors, get_weighted_dis
     get_weighted_accuracy
 from homework1 import read_dataset, feature_vectors, write_to_feature_vector_file, normalize_fv
 from GRNN import dist_squared, compute_fire_strengths, hf, compute_fire_strengths_CASIS25
-#from GeneticAlgorithms import replacement, evaluation, procreate, tournament_select_parents, initialize_population,\
-#    select_best_parents
+from GeneticAlgorithms import replacement, evaluation, procreate, tournament_select_parents, initialize_population,\
+    select_best_parents
 import Data_Utils
 from sklearn.preprocessing import StandardScaler, normalize
 from sklearn import svm
@@ -26,7 +26,8 @@ week_5_author_1 = read_dataset("247Sports_Brown_TennesseeVsGA_wk5.txt")
 week_6_author_1 = read_dataset("247Sports_Brown_TennesseeVsAUB_wk6.txt")
 week_7_author_1 = read_dataset("247Sports_Brown_TennesseeVsALA_wk7.txt")
 week_8_author_1 = read_dataset("247Sports_Brown_TennesseeVsSC_wk8.txt")
-
+week_9_author_1 = read_dataset("247Sports_Brown_TennesseeVsCHA_wk9.txt")
+week_10_author_1 = read_dataset("247Sports_Brown_TennesseeVsKY_wk10.txt")
 
 week_1_author_2 = read_dataset("247Sports_Callahan_TennesseevsWVA_wk1.txt")
 week_2_author_2 = read_dataset("247Sports_Callahan_TennesseeVsETN_wk2.txt")
@@ -36,6 +37,8 @@ week_5_author_2 = read_dataset("247Sports_Callahan_TennesseeVsGA_wk5.txt")
 week_6_author_2 = read_dataset("247Sports_Callahan_TennesseeVsAUB_wk6.txt")
 week_7_author_2 = read_dataset("247Sports_Callahan_TennesseeVsALA_wk7.txt")
 week_8_author_2 = read_dataset("247Sports_Callahan_TennesseeVsSC_wk8.txt")
+week_9_author_2 = read_dataset("247Sports_Callahan_TennesseeVsCHA_wk9.txt")
+week_10_author_2 = read_dataset("247Sports_Callahan_TennesseeVsKY_wk10.txt")
 
 week_1_author_3 = read_dataset("247Sports_Ramey_TennesseevsWVA_wk1.txt")
 week_2_author_3 = read_dataset("247Sports_Ramey_TennesseeVsETN_wk2.txt")
@@ -45,6 +48,8 @@ week_5_author_3 = read_dataset("247Sports_Ramey_TennesseeVsGA_wk5.txt")
 week_6_author_3 = read_dataset("247Sports_Ramey_TennesseeVsAUB_wk6.txt")
 week_7_author_3 = read_dataset("247Sports_Ramey_TennesseeVsALA_wk7.txt")
 week_8_author_3 = read_dataset("247Sports_Ramey_TennesseeVsSC_wk8.txt")
+week_9_author_3 = read_dataset("247Sports_Ramey_TennesseeVsCHA_wk9.txt")
+week_10_author_3 = read_dataset("247Sports_Ramey_TennesseeVsKY_wk10.txt")
 
 week_1_author_4 = read_dataset("247Sports_Rucker_TennesseevsWVA_wk1.txt")
 week_2_author_4 = read_dataset("247Sports_Rucker_TennesseeVsETN_wk2.txt")
@@ -54,6 +59,8 @@ week_5_author_4 = read_dataset("247Sports_Rucker_TennesseeVsGA_wk5.txt")
 week_6_author_4 = read_dataset("247Sports_Rucker_TennesseeVsAUB_wk6.txt")
 week_7_author_4 = read_dataset("247Sports_Rucker_TennesseeVsALA_wk7.txt")
 week_8_author_4 = read_dataset("247Sports_Rucker_TennesseeVsSC_wk8.txt")
+week_9_author_4 = read_dataset("247Sports_Rucker_TennesseeVsCHA_wk9.txt")
+week_10_author_4 = read_dataset("247Sports_Rucker_TennesseeVsKY_wk10.txt")
 
 week_1_author_5 = read_dataset("RockyTopTalk_Burlage_TennesseeVsWVA_wk1.txt")
 week_2_author_5 = read_dataset("RockyTopTalk_Burlage_TennesseeVsETSU_wk2.txt")
@@ -63,6 +70,8 @@ week_5_author_5 = read_dataset("RockyTopTalk_Burlage_TennesseeVsGA_wk5.txt")
 week_6_author_5 = read_dataset("RockyTopTalk_Burlage_TennesseeVsAUB_wk6.txt")
 week_7_author_5 = read_dataset("RockyTopTalk_Burlage_TennesseeVsALA_wk7.txt")
 week_8_author_5 = read_dataset("RockyTopTalk_Burlage_TennesseeVsSC_wk8.txt")
+week_9_author_5 = read_dataset("RockyTopTalk_Burlage_TennesseeVsCHA_wk9.txt")
+week_10_author_5 = read_dataset("RockyTopTalk_Burlage_TennesseeVsKY_wk10.txt")
 
 week_1_author_6 = read_dataset("CFN_Fiutak_TennesseevsWVA_wk1.txt")
 week_2_author_6 = read_dataset("CFN_Fiutak_TennesseeVsETN_wk2.txt")
@@ -72,7 +81,8 @@ week_5_author_6 = read_dataset("CFN_Fiutak_TennesseeVsGA_wk5.txt")
 week_6_author_6 = read_dataset("CFN_Fiutak_TennesseeVsAUB_wk6.txt")
 week_7_author_6 = read_dataset("CFN_Fiutak_TennesseeVsALA_wk7.txt")
 week_8_author_6 = read_dataset("CFN_Fiutak_TennesseeVsSC_wk8.txt")
-
+week_9_author_6 = read_dataset("CFN_Fiutak_TennesseeVsCHA_wk9.txt")
+week_10_author_6 = read_dataset("CFN_Fiutak_TennesseeVsKY_wk10.txt")
 
 week_1_author_7 = read_dataset("RockyTopTalk_Knapp_TennesseeVsWVA_wk1.txt")
 week_2_author_7 = read_dataset("RockyTopTalk_Knapp_TennesseeVsETSU_wk2.txt")
@@ -82,6 +92,8 @@ week_5_author_7 = read_dataset("RockyTopTalk_Knapp_TennesseeVsGA_wk5.txt")
 week_6_author_7 = read_dataset("RockyTopTalk_Knapp_TennesseeVsAUB_wk6.txt")
 week_7_author_7 = read_dataset("RockyTopTalk_Knapp_TennesseeVsALA_wk7.txt")
 week_8_author_7 = read_dataset("RockyTopTalk_Knapp_TennesseeVsSC_wk8.txt")
+week_9_author_7 = read_dataset("RockyTopTalk_Knapp_TennesseeVsCHA_wk9.txt")
+week_10_author_7 = read_dataset("RockyTopTalk_Knapp_TennesseeVsKY_wk10.txt")
 
 week_1_author_8 = read_dataset("Knoxnews_Toppmeyer_TennesseevsWVA_wk1.txt")
 week_2_author_8 = read_dataset("Knoxnews_Toppmeyer_TennesseeVsETN_wk2.txt")
@@ -91,7 +103,8 @@ week_5_author_8 = read_dataset("Knoxnews_Toppmeyer_TennesseeVsGA_wk5.txt")
 week_6_author_8 = read_dataset("Knoxnews_Toppmeyer_TennesseeVsAUB_wk6.txt")
 week_7_author_8 = read_dataset("Knoxnews_Toppmeyer_TennesseeVsALA_wk7.txt")
 week_8_author_8 = read_dataset("Knoxnews_Toppmeyer_TennesseeVsSC_wk8.txt")
-
+week_9_author_8 = read_dataset("Knoxnews_Toppmeyer_TennesseeVsCHA_wk9.txt")
+week_10_author_8 = read_dataset("Knoxnews_Toppmeyer_TennesseeVsKY_wk10.txt")
 
 week_1_author_9 = read_dataset("Knoxnews_Wilson_TennesseevsWVA_wk1.txt")
 week_2_author_9 = read_dataset("Knoxnews_Wilson_TennesseeVsETN_wk2.txt")
@@ -101,6 +114,8 @@ week_5_author_9 = read_dataset("Knoxnews_Wilson_TennesseeVsGA_wk5.txt")
 week_6_author_9 = read_dataset("Knoxnews_Wilson_TennesseeVsAUB_wk6.txt")
 week_7_author_9 = read_dataset("Knoxnews_Wilson_TennesseeVsALA_wk7.txt")
 week_8_author_9 = read_dataset("Knoxnews_Wilson_TennesseeVsSC_wk8.txt")
+week_9_author_9 = read_dataset("Knoxnews_Wilson_TennesseeVsCHA_wk9.txt")
+week_10_author_9 = read_dataset("Knoxnews_Wilson_TennesseeVsKY_wk10.txt")
 
 week_1_author_10 = read_dataset("RockyTopTalk_Winter_TennesseevsWVA_wk1.txt")
 week_2_author_10 = read_dataset("RockyTopTalk_Winter_TennesseeVsETN_wk2.txt")
@@ -110,6 +125,8 @@ week_5_author_10 = read_dataset("RockyTopTalk_Winter_TennesseeVsGA_wk5.txt")
 week_6_author_10 = read_dataset("RockyTopTalk_Winter_TennesseeVsAUB_wk6.txt")
 week_7_author_10 = read_dataset("RockyTopTalk_Winter_TennesseeVsALA_wk7.txt")
 week_8_author_10 = read_dataset("RockyTopTalk_Winter_TennesseeVsSC_wk8.txt")
+week_9_author_10 = read_dataset("RockyTopTalk_Winter_TennesseeVsCHA_wk9.txt")
+week_10_author_10 = read_dataset("RockyTopTalk_Winter_TennesseeVsKY_wk10.txt")
 
 week_1_author_11 = read_dataset("RockyTopTalk_Lambert_TennesseevsWVA_wk1.txt")
 week_2_author_11 = read_dataset("RockyTopTalk_Lambert_TennesseeVsETSU_wk2.txt")
@@ -119,6 +136,8 @@ week_5_author_11 = read_dataset("RockyTopTalk_Lambert_TennesseeVsGA_wk5.txt")
 week_6_author_11 = read_dataset("RockyTopTalk_Lambert_TennesseeVsAUB_wk6.txt")
 week_7_author_11 = read_dataset("RockyTopTalk_Lambert_TennesseeVsALA_wk7.txt")
 week_8_author_11 = read_dataset("RockyTopTalk_Lambert_TennesseeVsSC_wk8.txt")
+week_9_author_11 = read_dataset("RockyTopTalk_Lambert_TennesseeVsCHA_wk9.txt")
+week_10_author_11 = read_dataset("RockyTopTalk_Lambert_TennesseeVsKY_wk10.txt")
 
 week_1_author_12 = read_dataset("RockyTopTalk_Taylor_TennesseevsWVA_wk1.txt")
 week_2_author_12 = read_dataset("RockyTopTalk_Taylor_TennesseeVsETSU_wk2.txt")
@@ -128,6 +147,8 @@ week_5_author_12 = read_dataset("RockyTopTalk_Taylor_TennesseeVsGA_wk5.txt")
 week_6_author_12 = read_dataset("RockyTopTalk_Taylor_TennesseeVsAUB_wk6.txt")
 week_7_author_12 = read_dataset("RockyTopTalk_Taylor_TennesseeVsALA_wk7.txt")
 week_8_author_12 = read_dataset("RockyTopTalk_Taylor_TennesseeVsSC_wk8.txt")
+week_9_author_12 = read_dataset("RockyTopTalk_Taylor_TennesseeVsCHA_wk9.txt")
+week_10_author_12 = read_dataset("RockyTopTalk_Taylor_TennesseeVsKY_wk10.txt")
 
 
 #make the feature vectors and store in a list of feature vectors
@@ -140,7 +161,8 @@ week_5_author_1_fv = feature_vectors(week_5_author_1, 1)
 week_6_author_1_fv = feature_vectors(week_6_author_1, 1)
 week_7_author_1_fv = feature_vectors(week_7_author_1, 1)
 week_8_author_1_fv = feature_vectors(week_8_author_1, 1)
-
+week_9_author_1_fv = feature_vectors(week_9_author_1, 1)
+week_10_author_1_fv = feature_vectors(week_10_author_1, 1)
 
 feature_vector_list.append(week_1_author_1_fv)
 feature_vector_list.append(week_2_author_1_fv)
@@ -150,8 +172,8 @@ feature_vector_list.append(week_5_author_1_fv)
 feature_vector_list.append(week_6_author_1_fv)
 feature_vector_list.append(week_7_author_1_fv)
 feature_vector_list.append(week_8_author_1_fv)
-
-
+feature_vector_list.append(week_9_author_1_fv)
+feature_vector_list.append(week_10_author_1_fv)
 
 week_1_author_2_fv = feature_vectors(week_1_author_2, 2)
 week_2_author_2_fv = feature_vectors(week_2_author_2, 2)
@@ -161,7 +183,8 @@ week_5_author_2_fv = feature_vectors(week_5_author_2, 2)
 week_6_author_2_fv = feature_vectors(week_6_author_2, 2)
 week_7_author_2_fv = feature_vectors(week_7_author_2, 2)
 week_8_author_2_fv = feature_vectors(week_8_author_2, 2)
-
+week_9_author_2_fv = feature_vectors(week_9_author_2, 2)
+week_10_author_2_fv = feature_vectors(week_10_author_2, 2)
 
 feature_vector_list.append(week_1_author_2_fv)
 feature_vector_list.append(week_2_author_2_fv)
@@ -171,7 +194,8 @@ feature_vector_list.append(week_5_author_2_fv)
 feature_vector_list.append(week_6_author_2_fv)
 feature_vector_list.append(week_7_author_2_fv)
 feature_vector_list.append(week_8_author_2_fv)
-
+feature_vector_list.append(week_9_author_2_fv)
+feature_vector_list.append(week_10_author_2_fv)
 
 week_1_author_3_fv = feature_vectors(week_1_author_3, 3)
 week_2_author_3_fv = feature_vectors(week_2_author_3, 3)
@@ -181,7 +205,8 @@ week_5_author_3_fv = feature_vectors(week_5_author_3, 3)
 week_6_author_3_fv = feature_vectors(week_6_author_3, 3)
 week_7_author_3_fv = feature_vectors(week_7_author_3, 3)
 week_8_author_3_fv = feature_vectors(week_8_author_3, 3)
-
+week_9_author_3_fv = feature_vectors(week_9_author_3, 3)
+week_10_author_3_fv = feature_vectors(week_10_author_3, 3)
 
 feature_vector_list.append(week_1_author_3_fv)
 feature_vector_list.append(week_2_author_3_fv)
@@ -191,8 +216,8 @@ feature_vector_list.append(week_5_author_3_fv)
 feature_vector_list.append(week_6_author_3_fv)
 feature_vector_list.append(week_7_author_3_fv)
 feature_vector_list.append(week_8_author_3_fv)
-
-
+feature_vector_list.append(week_9_author_3_fv)
+feature_vector_list.append(week_10_author_3_fv)
 
 week_1_author_4_fv = feature_vectors(week_1_author_4, 4)
 week_2_author_4_fv = feature_vectors(week_2_author_4, 4)
@@ -202,7 +227,8 @@ week_5_author_4_fv = feature_vectors(week_5_author_4, 4)
 week_6_author_4_fv = feature_vectors(week_6_author_4, 4)
 week_7_author_4_fv = feature_vectors(week_7_author_4, 4)
 week_8_author_4_fv = feature_vectors(week_8_author_4, 4)
-
+week_9_author_4_fv = feature_vectors(week_9_author_4, 4)
+week_10_author_4_fv = feature_vectors(week_10_author_4, 4)
 
 feature_vector_list.append(week_1_author_4_fv)
 feature_vector_list.append(week_2_author_4_fv)
@@ -212,8 +238,8 @@ feature_vector_list.append(week_5_author_4_fv)
 feature_vector_list.append(week_6_author_4_fv)
 feature_vector_list.append(week_7_author_4_fv)
 feature_vector_list.append(week_8_author_4_fv)
-
-
+feature_vector_list.append(week_9_author_4_fv)
+feature_vector_list.append(week_10_author_4_fv)
 
 week_1_author_5_fv = feature_vectors(week_1_author_5, 5)
 week_2_author_5_fv = feature_vectors(week_2_author_5, 5)
@@ -223,7 +249,8 @@ week_5_author_5_fv = feature_vectors(week_5_author_5, 5)
 week_6_author_5_fv = feature_vectors(week_6_author_5, 5)
 week_7_author_5_fv = feature_vectors(week_7_author_5, 5)
 week_8_author_5_fv = feature_vectors(week_8_author_5, 5)
-
+week_9_author_5_fv = feature_vectors(week_9_author_5, 5)
+week_10_author_5_fv = feature_vectors(week_10_author_5, 5)
 
 feature_vector_list.append(week_1_author_5_fv)
 feature_vector_list.append(week_2_author_5_fv)
@@ -233,7 +260,8 @@ feature_vector_list.append(week_5_author_5_fv)
 feature_vector_list.append(week_6_author_5_fv)
 feature_vector_list.append(week_7_author_5_fv)
 feature_vector_list.append(week_8_author_5_fv)
-
+feature_vector_list.append(week_9_author_5_fv)
+feature_vector_list.append(week_10_author_5_fv)
 
 week_1_author_6_fv = feature_vectors(week_1_author_6, 6)
 week_2_author_6_fv = feature_vectors(week_2_author_6, 6)
@@ -243,7 +271,8 @@ week_5_author_6_fv = feature_vectors(week_5_author_6, 6)
 week_6_author_6_fv = feature_vectors(week_6_author_6, 6)
 week_7_author_6_fv = feature_vectors(week_7_author_6, 6)
 week_8_author_6_fv = feature_vectors(week_8_author_6, 6)
-
+week_9_author_6_fv = feature_vectors(week_9_author_6, 6)
+week_10_author_6_fv = feature_vectors(week_10_author_6, 6)
 
 feature_vector_list.append(week_1_author_6_fv)
 feature_vector_list.append(week_2_author_6_fv)
@@ -253,8 +282,8 @@ feature_vector_list.append(week_5_author_6_fv)
 feature_vector_list.append(week_6_author_6_fv)
 feature_vector_list.append(week_7_author_6_fv)
 feature_vector_list.append(week_8_author_6_fv)
-
-
+feature_vector_list.append(week_9_author_6_fv)
+feature_vector_list.append(week_10_author_6_fv)
 
 week_1_author_7_fv = feature_vectors(week_1_author_7, 7)
 week_2_author_7_fv = feature_vectors(week_2_author_7, 7)
@@ -264,7 +293,8 @@ week_5_author_7_fv = feature_vectors(week_5_author_7, 7)
 week_6_author_7_fv = feature_vectors(week_6_author_7, 7)
 week_7_author_7_fv = feature_vectors(week_7_author_7, 7)
 week_8_author_7_fv = feature_vectors(week_8_author_7, 7)
-
+week_9_author_7_fv = feature_vectors(week_9_author_7, 7)
+week_10_author_7_fv = feature_vectors(week_10_author_7, 7)
 
 feature_vector_list.append(week_1_author_7_fv)
 feature_vector_list.append(week_2_author_7_fv)
@@ -274,8 +304,8 @@ feature_vector_list.append(week_5_author_7_fv)
 feature_vector_list.append(week_6_author_7_fv)
 feature_vector_list.append(week_7_author_7_fv)
 feature_vector_list.append(week_8_author_7_fv)
-
-
+feature_vector_list.append(week_9_author_7_fv)
+feature_vector_list.append(week_10_author_7_fv)
 
 week_1_author_8_fv = feature_vectors(week_1_author_8, 8)
 week_2_author_8_fv = feature_vectors(week_2_author_8, 8)
@@ -285,7 +315,8 @@ week_5_author_8_fv = feature_vectors(week_5_author_8, 8)
 week_6_author_8_fv = feature_vectors(week_6_author_8, 8)
 week_7_author_8_fv = feature_vectors(week_7_author_8, 8)
 week_8_author_8_fv = feature_vectors(week_8_author_8, 8)
-
+week_9_author_8_fv = feature_vectors(week_9_author_8, 8)
+week_10_author_8_fv = feature_vectors(week_10_author_8, 8)
 
 feature_vector_list.append(week_1_author_8_fv)
 feature_vector_list.append(week_2_author_8_fv)
@@ -295,8 +326,8 @@ feature_vector_list.append(week_5_author_8_fv)
 feature_vector_list.append(week_6_author_8_fv)
 feature_vector_list.append(week_7_author_8_fv)
 feature_vector_list.append(week_8_author_8_fv)
-
-
+feature_vector_list.append(week_9_author_8_fv)
+feature_vector_list.append(week_10_author_8_fv)
 
 week_1_author_9_fv = feature_vectors(week_1_author_9, 9)
 week_2_author_9_fv = feature_vectors(week_2_author_9, 9)
@@ -306,7 +337,8 @@ week_5_author_9_fv = feature_vectors(week_5_author_9, 9)
 week_6_author_9_fv = feature_vectors(week_6_author_9, 9)
 week_7_author_9_fv = feature_vectors(week_7_author_9, 9)
 week_8_author_9_fv = feature_vectors(week_8_author_9, 9)
-
+week_9_author_9_fv = feature_vectors(week_9_author_9, 9)
+week_10_author_9_fv = feature_vectors(week_10_author_9, 9)
 
 feature_vector_list.append(week_1_author_9_fv)
 feature_vector_list.append(week_2_author_9_fv)
@@ -316,8 +348,8 @@ feature_vector_list.append(week_5_author_9_fv)
 feature_vector_list.append(week_6_author_9_fv)
 feature_vector_list.append(week_7_author_9_fv)
 feature_vector_list.append(week_8_author_9_fv)
-
-
+feature_vector_list.append(week_9_author_9_fv)
+feature_vector_list.append(week_10_author_9_fv)
 
 week_1_author_10_fv = feature_vectors(week_1_author_10, 10)
 week_2_author_10_fv = feature_vectors(week_2_author_10, 10)
@@ -327,7 +359,8 @@ week_5_author_10_fv = feature_vectors(week_5_author_10, 10)
 week_6_author_10_fv = feature_vectors(week_6_author_10, 10)
 week_7_author_10_fv = feature_vectors(week_7_author_10, 10)
 week_8_author_10_fv = feature_vectors(week_8_author_10, 10)
-
+week_9_author_10_fv = feature_vectors(week_9_author_10, 10)
+week_10_author_10_fv = feature_vectors(week_10_author_10, 10)
 
 feature_vector_list.append(week_1_author_10_fv)
 feature_vector_list.append(week_2_author_10_fv)
@@ -337,8 +370,8 @@ feature_vector_list.append(week_5_author_10_fv)
 feature_vector_list.append(week_6_author_10_fv)
 feature_vector_list.append(week_7_author_10_fv)
 feature_vector_list.append(week_8_author_10_fv)
-
-
+feature_vector_list.append(week_9_author_10_fv)
+feature_vector_list.append(week_10_author_10_fv)
 
 week_1_author_11_fv = feature_vectors(week_1_author_11, 11)
 week_2_author_11_fv = feature_vectors(week_2_author_11, 11)
@@ -348,7 +381,8 @@ week_5_author_11_fv = feature_vectors(week_5_author_11, 11)
 week_6_author_11_fv = feature_vectors(week_6_author_11, 11)
 week_7_author_11_fv = feature_vectors(week_7_author_11, 11)
 week_8_author_11_fv = feature_vectors(week_8_author_11, 11)
-
+week_9_author_11_fv = feature_vectors(week_9_author_11, 11)
+week_10_author_11_fv = feature_vectors(week_10_author_11, 11)
 
 feature_vector_list.append(week_1_author_11_fv)
 feature_vector_list.append(week_2_author_11_fv)
@@ -358,8 +392,8 @@ feature_vector_list.append(week_5_author_11_fv)
 feature_vector_list.append(week_6_author_11_fv)
 feature_vector_list.append(week_7_author_11_fv)
 feature_vector_list.append(week_8_author_11_fv)
-
-
+feature_vector_list.append(week_9_author_11_fv)
+feature_vector_list.append(week_10_author_11_fv)
 
 week_1_author_12_fv = feature_vectors(week_1_author_12, 12)
 week_2_author_12_fv = feature_vectors(week_2_author_12, 12)
@@ -369,7 +403,8 @@ week_5_author_12_fv = feature_vectors(week_5_author_12, 12)
 week_6_author_12_fv = feature_vectors(week_6_author_12, 12)
 week_7_author_12_fv = feature_vectors(week_7_author_12, 12)
 week_8_author_12_fv = feature_vectors(week_8_author_12, 12)
-
+week_9_author_12_fv = feature_vectors(week_9_author_12, 12)
+week_10_author_12_fv = feature_vectors(week_10_author_12, 12)
 
 feature_vector_list.append(week_1_author_12_fv)
 feature_vector_list.append(week_2_author_12_fv)
@@ -379,7 +414,8 @@ feature_vector_list.append(week_5_author_12_fv)
 feature_vector_list.append(week_6_author_12_fv)
 feature_vector_list.append(week_7_author_12_fv)
 feature_vector_list.append(week_8_author_12_fv)
-
+feature_vector_list.append(week_9_author_12_fv)
+feature_vector_list.append(week_10_author_12_fv)
 
 #Test against CASIS-25 Dataset
 test_1000_1 = read_dataset("1000_1.txt")
@@ -848,7 +884,7 @@ print average_sentences(week_1_author_10, week_2_author_10, week_3_author_10)
 
 # PROJECT 3
 
-'''
+
 # Separating Authors and Feature Vectors
 authors = []
 for i in range(len(feature_vector_list)):
@@ -913,8 +949,8 @@ print fold_accuracy
 print(np.mean(fold_accuracy, axis=0))
 
 # create SEC file
-file = open("SECGA.txt","w+")
-
+file = open("SECGATest.txt","w+")
+'''
 # Steady State Genetic Algorithm
 # No Innovations: 95, 25, 2, 2, 1, 1, 5, False, 5000, 10
 SSGA_fm_length = 95
@@ -962,7 +998,7 @@ for index in range(SSGA_number_of_runs):
     # while loop makes sure that the correct number of evaluations have been performed
     while (SSGA_iterations > 0):
         SSGA_sum = 0
-        #print SSGA_iterations
+        print SSGA_iterations
 
         # 2 parents are randomly selected from the feature mask generation
         SSGA_parent_list = tournament_select_parents(SSGA_generation_list_rated, SSGA_number_of_parents,
@@ -1038,7 +1074,7 @@ EGA_number_to_replace = 24
 EGA_mutation_rate = 1
 EGA_is_replacement_combined = True
 EGA_number_of_iterations = 5000
-EGA_number_of_runs = 10
+EGA_number_of_runs = 1
 EGA_last_generation_ratings = []
 
 file.write("\n\nElitist Genetic Algorithm\n")
@@ -1155,7 +1191,7 @@ EDA_number_to_replace = 24
 EDA_mutation_rate = 1
 EDA_is_replacement_combined = False
 EDA_number_of_iterations = 5000
-EDA_number_of_runs = 10
+EDA_number_of_runs = 1
 EDA_last_generation_ratings = []
 
 file.write("\n\nEstimation of Distribution Algorithm\n")
@@ -1257,8 +1293,8 @@ file.write("\nEDA Average Rating: ")
 file.write('%s' % EDA_final_average)
 
 # close SEC file
-file.close()'''
-
+file.close()
+'''
 
 
 
@@ -1276,10 +1312,10 @@ for i in range(len(feature_vector_list)):
 
 
 feature_mask = [1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0]
-target = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]
+target = [0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0]
 
 # create Probing SEC file
-file = open("ProbingSECGA.txt","w+")
+file = open("ProbingSECGA3.txt","w+")
 
 # Steady State Genetic Algorithm for Probing
 # No Innovations: 95, 25, 2, 2, 1, 1, 5, False, 5000, 10
