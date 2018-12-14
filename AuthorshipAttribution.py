@@ -15,6 +15,7 @@ from sklearn.model_selection import StratifiedKFold
 import numpy as np
 from Probing import initialize_tfv_population, evaluation_tfv, tournament_select_parents_tfv, select_best_parents_tfv,\
     procreate_tfv, replacement_tfv
+from AIS1 import tfv_predict_1
 
 
 #read in text files
@@ -883,7 +884,7 @@ print average_sentences(week_1_author_10, week_2_author_10, week_3_author_10)
 #normalize_fv("SEC_Sportswriters_Normalized_Feature_Vectors.txt", feature_vector_list)
 
 # PROJECT 3
-
+'''
 
 # Separating Authors and Feature Vectors
 authors = []
@@ -948,9 +949,10 @@ for train, test in skf.split(CU_X, Y):
 print fold_accuracy
 print(np.mean(fold_accuracy, axis=0))
 
+
 # create SEC file
 file = open("SECGATest.txt","w+")
-'''
+
 # Steady State Genetic Algorithm
 # No Innovations: 95, 25, 2, 2, 1, 1, 5, False, 5000, 10
 SSGA_fm_length = 95
@@ -1299,7 +1301,7 @@ file.close()
 
 
 
-
+# PROJECT 4
 
 # Separating Authors and Feature Vectors
 authors = []
@@ -1315,7 +1317,7 @@ feature_mask = [1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0
 target = [0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0]
 
 # create Probing SEC file
-file = open("ProbingSECGA3.txt","w+")
+file = open("TestSEC.txt","w+")
 
 # Steady State Genetic Algorithm for Probing
 # No Innovations: 95, 25, 2, 2, 1, 1, 5, False, 5000, 10
@@ -1328,7 +1330,7 @@ SSGA_number_to_replace = 1
 SSGA_mutation_rate = 1
 SSGA_is_replacement_combined = True
 SSGA_number_of_iterations = 5000
-SSGA_number_of_runs = 10
+SSGA_number_of_runs = 1
 SSGA_last_generation_ratings = []
 
 file.write("Steady State Genetic Algorithm\n")
@@ -1442,7 +1444,7 @@ EGA_number_to_replace = 24
 EGA_mutation_rate = 1
 EGA_is_replacement_combined = True
 EGA_number_of_iterations = 5000
-EGA_number_of_runs = 10
+EGA_number_of_runs = 1
 EGA_last_generation_ratings = []
 
 file.write("\n\nElitist Genetic Algorithm\n")
@@ -1559,7 +1561,7 @@ EDA_number_to_replace = 24
 EDA_mutation_rate = 1
 EDA_is_replacement_combined = False
 EDA_number_of_iterations = 5000
-EDA_number_of_runs = 10
+EDA_number_of_runs = 1
 EDA_last_generation_ratings = []
 
 file.write("\n\nEstimation of Distribution Algorithm\n")
@@ -1661,5 +1663,188 @@ file.write('%s' % EDA_final_average)
 
 # close Probing SEC file
 file.close()
+'''
+
+# PROJECT 5
+
+# Separating Authors and Feature Vectors
+original_authors = []
+for i in range(len(feature_vector_list)):
+    original_authors.append(str(feature_vector_list[i][-1]))
+
+original_feature_vectors = list(feature_vector_list)
+for i in range(len(feature_vector_list)):
+    del original_feature_vectors[i][-1]
+
+# SELF ATTACK
+
+# Create test feature vectors and test author list
+attack_feature_vector_list = []
+text_title = ["Brown", "Burlage", "Wilson", "1000", "1005", "1010"]
+
+# Read in attack text files
+Brown_attack = read_dataset("Brown_week1_masked.txt")
+Burlage_attack = read_dataset("Burlage_week1_masked.txt")
+Wilson_attack = read_dataset("Wilson_week1_masked.txt")
+A1000_attack = read_dataset("A1000_week1_masked.txt")
+A1005_attack = read_dataset("A1005_week1_masked.txt")
+A1010_attack = read_dataset("A1010_week1_masked.txt")
+
+# Make the feature vectors and store in a list of feature vectors
+Brown_attack_fv = feature_vectors(Brown_attack, 6)
+attack_feature_vector_list.append(Brown_attack_fv)
+Burlage_attack_fv = feature_vectors(Burlage_attack, 6)
+attack_feature_vector_list.append(Burlage_attack_fv)
+Wilson_attack_fv = feature_vectors(Wilson_attack, 6)
+attack_feature_vector_list.append(Wilson_attack_fv)
+A1000_attack_fv = feature_vectors(A1000_attack, 6)
+attack_feature_vector_list.append(A1000_attack_fv)
+A1005_attack_fv = feature_vectors(A1005_attack, 6)
+attack_feature_vector_list.append(A1005_attack_fv)
+A1010_attack_fv = feature_vectors(A1010_attack, 6)
+attack_feature_vector_list.append(A1010_attack_fv)
+
+# Separating Authors and Feature Vectors
+attack_authors = []
+for i in range(len(attack_feature_vector_list)):
+    attack_authors.append(str(attack_feature_vector_list[i][-1]))
+
+attack_feature_vectors = list(attack_feature_vector_list)
+for i in range(len(attack_feature_vector_list)):
+    del attack_feature_vectors[i][-1]
+
+# Set feature mask
+feature_mask = [1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1,
+                1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1,
+                0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0]
+
+predictions = tfv_predict_1(original_feature_vectors, attack_feature_vectors, original_authors, attack_authors,
+                            feature_mask)
+
+for i in range(len(predictions)):
+    print text_title[i] + ": " + predictions[i]
+
+# ATTACK VERSION ONE
+
+# Create test feature vectors and test author list
+attack_feature_vector_list = []
+teams = ["Kentucky", "Mississippi State", "Texas A&M", "Vanderbilt", "LSU", "Alabama", "Florida", "Georgia", "Oklahoma"]
+
+# Read in attack text files
+Kentucky_attack = read_dataset("Kentucky_attack.txt")
+Mississippi_attack = read_dataset("Mississippi_attack.txt")
+TexasAM_attack = read_dataset("TexasA&M_attack.txt")
+Vanderbilt_attack = read_dataset("Vanderbilt_attack.txt")
+LSU_attack = read_dataset("LSU_attack.txt")
+Alabama_attack = read_dataset("Alabama_attack.txt")
+Florida_attack = read_dataset("Florida_attack.txt")
+Georgia_attack = read_dataset("Georgia_attack.txt")
+Oklahoma_attack = read_dataset("Oklahoma_attack.txt")
+
+# Make the feature vectors and store in a list of feature vectors
+Kentucky_attack_fv = feature_vectors(Kentucky_attack, 6)
+attack_feature_vector_list.append(Kentucky_attack_fv)
+Mississippi_attack_fv = feature_vectors(Mississippi_attack, 6)
+attack_feature_vector_list.append(Mississippi_attack_fv)
+TexasAM_attack_fv = feature_vectors(TexasAM_attack, 6)
+attack_feature_vector_list.append(TexasAM_attack_fv)
+Vanderbilt_attack_fv = feature_vectors(Vanderbilt_attack, 6)
+attack_feature_vector_list.append(Vanderbilt_attack_fv)
+LSU_attack_fv = feature_vectors(LSU_attack, 6)
+attack_feature_vector_list.append(LSU_attack_fv)
+Alabama_attack_fv = feature_vectors(Alabama_attack, 6)
+attack_feature_vector_list.append(Alabama_attack_fv)
+Florida_attack_fv = feature_vectors(Florida_attack, 6)
+attack_feature_vector_list.append(Florida_attack_fv)
+Georgia_attack_fv = feature_vectors(Georgia_attack, 6)
+attack_feature_vector_list.append(Georgia_attack_fv)
+Oklahoma_attack_fv = feature_vectors(Oklahoma_attack, 6)
+attack_feature_vector_list.append(Oklahoma_attack_fv)
+
+# Separating Authors and Feature Vectors
+attack_authors = []
+for i in range(len(attack_feature_vector_list)):
+    attack_authors.append(str(attack_feature_vector_list[i][-1]))
+
+attack_feature_vectors = list(attack_feature_vector_list)
+for i in range(len(attack_feature_vector_list)):
+    del attack_feature_vectors[i][-1]
+
+# Set feature mask
+feature_mask = [1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1,
+                1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1,
+                0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0]
+
+predictions = tfv_predict_1(original_feature_vectors, attack_feature_vectors, original_authors, attack_authors,
+                            feature_mask)
+
+for i in range(len(predictions)):
+    print teams[i] + ": " + predictions[i]
 
 
+# ATTACK VERSION TWO
+
+# Create test feature vectors and test author list
+attack_feature_vector_list = []
+teams = ["Kentucky", "Mississippi State", "Texas A&M", "Vanderbilt", "LSU", "Alabama", "Florida", "Georgia", "Oklahoma"]
+
+# Read in attack text files
+Kentucky_attack = read_dataset("Kentucky_attack.txt")
+Mississippi_attack = read_dataset("Mississippi_attack.txt")
+TexasAM_attack = read_dataset("TexasA&M_attack.txt")
+Vanderbilt_attack = read_dataset("Vanderbilt_attack.txt")
+LSU_attack = read_dataset("LSU_attack.txt")
+Alabama_attack = read_dataset("Alabama_attack.txt")
+Florida_attack = read_dataset("Florida_attack.txt")
+Georgia_attack = read_dataset("Georgia_attack.txt")
+Oklahoma_attack = read_dataset("Oklahoma_attack.txt")
+
+# Make the feature vectors and store in a list of feature vectors
+Kentucky_attack_fv = feature_vectors(Kentucky_attack, 6)
+attack_feature_vector_list.append(Kentucky_attack_fv)
+Mississippi_attack_fv = feature_vectors(Mississippi_attack, 6)
+attack_feature_vector_list.append(Mississippi_attack_fv)
+TexasAM_attack_fv = feature_vectors(TexasAM_attack, 6)
+attack_feature_vector_list.append(TexasAM_attack_fv)
+Vanderbilt_attack_fv = feature_vectors(Vanderbilt_attack, 6)
+attack_feature_vector_list.append(Vanderbilt_attack_fv)
+LSU_attack_fv = feature_vectors(LSU_attack, 6)
+attack_feature_vector_list.append(LSU_attack_fv)
+Alabama_attack_fv = feature_vectors(Alabama_attack, 6)
+attack_feature_vector_list.append(Alabama_attack_fv)
+Florida_attack_fv = feature_vectors(Florida_attack, 6)
+attack_feature_vector_list.append(Florida_attack_fv)
+Georgia_attack_fv = feature_vectors(Georgia_attack, 6)
+attack_feature_vector_list.append(Georgia_attack_fv)
+Oklahoma_attack_fv = feature_vectors(Oklahoma_attack, 6)
+attack_feature_vector_list.append(Oklahoma_attack_fv)
+
+# Separating Authors and Feature Vectors
+attack_authors = []
+for i in range(len(attack_feature_vector_list)):
+    attack_authors.append(str(attack_feature_vector_list[i][-1]))
+
+attack_feature_vectors = list(attack_feature_vector_list)
+for i in range(len(attack_feature_vector_list)):
+    del attack_feature_vectors[i][-1]
+
+# Set feature mask
+feature_mask = [1, 0, 1, 1, 1, 0, 0, 0, 0, 1,
+                0, 0, 0, 0, 0, 0, 1, 1, 1, 0,
+                1, 0, 1, 1, 0, 1, 1, 0, 0, 1,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+                0, 0, 1, 0, 1, 0, 1, 0, 0, 0,
+                0, 1, 1, 1, 0, 0, 1, 1, 0, 0,
+                0, 1, 1, 1, 0, 1, 1, 0, 1, 1,
+                0, 1, 1, 0, 1, 0, 1, 1, 1, 0,
+                0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+                1, 1, 0, 1, 0]
+
+for v in attack_feature_vectors:
+    print v
+predictions = tfv_predict_1(original_feature_vectors, attack_feature_vectors, original_authors, attack_authors,
+                            feature_mask)
+
+for i in range(len(predictions)):
+    print teams[i] + ": " + predictions[i]
+'''
